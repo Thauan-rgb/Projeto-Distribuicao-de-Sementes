@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configurações - IPA Sementes</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+body {
+  background-color: #f4f6f5;
+  font-family: 'Inter', sans-serif;
+  color: #1b4332;
+}
+
+/* HEADER */
+.header {
+  background-color: #0b6623;
+  color: #fff;
+  padding: 10px 0;
+  text-align: center;
+}
+.header img {
+  height: 50px;
+}
+.header h1 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 5px 0 0 0;
+}
+
+/* NAVBAR */
+.navbar {
+  background-color: #064e17;
+  justify-content: center;
+}
+.navbar-nav .nav-link {
+  color: #fff !important;
+  padding: 10px 20px;
+  font-weight: 500;
+}
+.navbar-nav .nav-link.active {
+  background-color: #2e7d32;
+  border-radius: 4px;
+}
+
+/* CONTEÚDO */
+.main-container {
+  max-width: 1200px;
+  margin: 60px auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+/* CARD BASE */
+.card-box {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+}
+
+/* SEÇÃO DE CONFIGURAÇÕES */
+.config-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.config-item:hover {
+  background-color: #ebf5ee;
+  border-color: #93c47d;
+}
+.config-item i {
+  font-size: 1.4rem;
+  color: #1b4332;
+  margin-right: 10px;
+}
+.config-item span {
+  flex-grow: 1;
+  font-weight: 500;
+}
+
+/* COMUNICAÇÃO INTERNA */
+.com-title {
+  font-weight: 700;
+  color: #064420;
+  margin-bottom: 20px;
+}
+
+.form-control {
+  border-radius: 8px;
+  margin-bottom: 15px;
+  height: 45px;
+}
+
+textarea.form-control {
+  height: 80px;
+}
+
+.priority-group label {
+  margin-right: 15px;
+  font-weight: 500;
+}
+
+.form-check {
+  margin-bottom: 8px;
+}
+
+.btn-publish {
+  background-color: #056937;
+  border: none;
+  width: 100%;
+  padding: 12px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+.btn-publish:hover {
+  background-color: #04582e;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 992px) {
+  .main-container {
+    grid-template-columns: 1fr;
+    margin: 40px 20px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header text-center">
+  <img src="img/logo2.png" alt="Logo IPA">
+  <h1>SEMEIA WEB</h1>
+</header>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container justify-content-center">
+    <ul class="navbar-nav">
+      <li class="nav-item"><a class="nav-link" href="dashboard_gerente.html">Início</a></li>
+      <li class="nav-item"><a class="nav-link" href="estoque.html">Estoque</a></li>
+      <li class="nav-item"><a class="nav-link" href="distribuicao.html">Distribuição</a></li>
+      <li class="nav-item"><a class="nav-link" href="relatorios.html">Relatórios</a></li>
+      <li class="nav-item"><a class="nav-link" href="usuarios.html">Usuários</a></li>
+      <li class="nav-item"><a class="nav-link active" href="configuracoes.html">Configurações</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- CONTEÚDO PRINCIPAL -->
+<div class="main-container">
+  <!-- LADO ESQUERDO -->
+  <div class="card-box">
+    <h3 class="mb-4 fw-bold">Configurações Gerais</h3>
+
+    <div class="config-item"><i class="bi bi-info-circle"></i><span>Informações Institucionais</span><i class="bi bi-chevron-right"></i></div>
+    <div class="config-item"><i class="bi bi-bell"></i><span>Notificações</span><i class="bi bi-chevron-right"></i></div>
+    <div class="config-item"><i class="bi bi-diagram-3"></i><span>Gerenciar Integrações</span><i class="bi bi-chevron-right"></i></div>
+    <div class="config-item"><i class="bi bi-translate"></i><span>Idiomas e Layout</span><i class="bi bi-chevron-right"></i></div>
+    <div class="config-item"><i class="bi bi-cloud-arrow-down"></i><span>Backup do Sistema</span><i class="bi bi-chevron-right"></i></div>
+    <div class="config-item"><i class="bi bi-door-closed"></i><span>Sair</span><i class="bi bi-chevron-right"></i></div>
+  </div>
+
+  <!-- LADO DIREITO -->
+  <div class="card-box">
+    <h3 class="com-title">Comunicação Interna</h3>
+
+    <form>
+      <input type="text" class="form-control" placeholder="Título do Comunicado">
+      <textarea class="form-control" placeholder="Assunto"></textarea>
+      <input type="date" class="form-control">
+
+      <div class="priority-group mb-3">
+        <label class="d-block mb-1">Prioridade:</label>
+        <label><input type="radio" name="prioridade" value="Alta"> Alta</label>
+        <label><input type="radio" name="prioridade" value="Média"> Média</label>
+        <label><input type="radio" name="prioridade" value="Baixa"> Baixa</label>
+      </div>
+
+      <div class="mb-3">
+        <label class="d-block mb-2 fw-semibold">Enviar para:</label>
+        <div class="form-check"><input class="form-check-input" type="checkbox" id="gerentes"><label class="form-check-label" for="gerentes">Gerentes Regionais</label></div>
+        <div class="form-check"><input class="form-check-input" type="checkbox" id="admins"><label class="form-check-label" for="admins">Administradores</label></div>
+        <div class="form-check"><input class="form-check-input" type="checkbox" id="armazem"><label class="form-check-label" for="armazem">Armazém</label></div>
+      </div>
+
+      <button type="button" class="btn-publish">Publicar Comunicado</button>
+    </form>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.querySelector('.btn-publish').addEventListener('click', () => {
+  alert('Comunicado publicado com sucesso!');
+});
+</script>
+
+</body>
+</html>
+
