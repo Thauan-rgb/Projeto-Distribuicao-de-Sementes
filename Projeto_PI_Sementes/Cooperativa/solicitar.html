@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Semeia Web - Solicitar Sementes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --cor-primaria: #2e7d32;
+      --cor-secundaria: #4caf50;
+      --cor-fundo: #f4f6f5;
+      --texto-principal: #333;
+      --branco: #fff;
+    }
+
+    body {
+      background-color: #f5f7f5;
+      font-family: "Poppins", "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+
+    /* ===== Sidebar ===== */
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+      background-color: #146c43;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 10px;
+      position: fixed;
+      transition: width 0.3s ease;
+      overflow: hidden;
+    }
+
+    .sidebar.collapsed { width: 80px; }
+
+    .toggler {
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #fff;
+      align-self: flex-start;
+      margin-bottom: 15px;
+      margin-left: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed .toggler {
+      align-self: center;
+      margin: 15px 0;
+    }
+
+    .toggler:hover { transform: scale(1.1); }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .logo img { width: 45px; transition: all 0.3s ease; }
+    .logo h4 { margin: 8px 0 0 0; color: #fff; transition: opacity 0.3s ease; }
+
+    .sidebar.collapsed .logo h4 {
+      opacity: 0;
+      height: 0;
+      overflow: hidden;
+    }
+
+    .profile {
+      text-align: center;
+      margin-bottom: 30px;
+      transition: all 0.3s ease;
+    }
+
+    .profile img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid white;
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed .profile img {
+      width: 45px;
+      height: 45px;
+    }
+
+    .sidebar.collapsed .profile h6 {
+      display: none;
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.3s ease, padding 0.3s ease;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active { background-color: #0d5032; }
+
+    .sidebar.collapsed a {
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .sidebar.collapsed a span { display: none; }
+
+    .logout {
+      margin-top: auto;
+      width: 100%;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      padding-top: 15px;
+    }
+
+    .logout a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      transition: background 0.3s ease;
+    }
+
+    .logout a:hover { background-color: #0d5032; }
+
+    .sidebar.collapsed .logout a {
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .sidebar.collapsed .logout a span { display: none; }
+
+    /* ===== Main Content ===== */
+    .main-content {
+      margin-left: 250px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: margin-left 0.3s ease, width 0.3s ease;
+      width: calc(100% - 250px);
+    }
+
+    .sidebar.collapsed ~ .main-content {
+      margin-left: 80px;
+      width: calc(100% - 80px);
+    }
+
+    header {
+      background-color: var(--branco);
+      padding: 15px 25px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h4 { margin: 0; color: var(--texto-principal); }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-info img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+    }
+
+    main {
+      flex: 1;
+      padding: 25px;
+      background-color: var(--cor-fundo);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    /* ===== Formulário ===== */
+    .form-container {
+      background: var(--branco);
+      border-radius: 12px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+      padding: 30px;
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .form-container h5 {
+      color: var(--cor-primaria);
+      font-weight: 600;
+      margin-bottom: 25px;
+    }
+
+    label {
+      font-weight: 500;
+      color: var(--texto-principal);
+    }
+
+    input, select, textarea {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--cor-secundaria);
+      box-shadow: 0 0 4px rgba(76, 175, 80, 0.3);
+    }
+
+    textarea { resize: none; }
+
+    .btn-success {
+      background-color: var(--cor-secundaria);
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: 0.3s;
+      float: right;
+    }
+
+    .btn-success:hover { background-color: var(--cor-primaria); }
+  </style>
+</head>
+<body>
+  <!-- ===== Sidebar ===== -->
+  <div class="sidebar" id="sidebar">
+    <i class="bi bi-list toggler" id="toggle-btn"></i>
+
+    <div class="logo">
+      <img src="img/logo2.png" alt="Semeia Web">
+      <h4>Semeia Web</h4>
+    </div>
+
+    <div class="profile">
+      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Usuário">
+      <h6>Katy Perry</h6>
+    </div>
+
+    <a href="dashboard_cooperativa.html"><i class="bi bi-house-fill"></i><span>Início</span></a>
+    <a href="lotes.html"><i class="bi bi-box-seam"></i><span>Lotes de Sementes</span></a>
+    <a href="distribuicao.html"><i class="bi bi-truck"></i><span>Distribuição</span></a>
+    <a href="agricultores.html"><i class="bi bi-people"></i><span>Agricultores</span></a>
+    <a href="relatorios.html"><i class="bi bi-file-earmark-text"></i><span>Relatórios</span></a>
+    <a href="solicitar.html" class="active"><i class="bi bi-plus-circle"></i><span>Solicitar Sementes</span></a>
+    <a href="rastreamento.html"><i class="bi bi-search"></i><span>Rastreamento</span></a>
+    <a href="notificacoes.html"><i class="bi bi-bell"></i><span>Notificações</span></a>
+    <a href="configuracao.html"><i class="bi bi-gear"></i><span>Configurações</span></a>
+
+    <div class="logout">
+      <a href="../login.html"><i class="bi bi-box-arrow-right"></i><span>Sair</span></a>
+    </div>
+  </div>
+
+  <!-- ===== Conteúdo Principal ===== -->
+  <div class="main-content" id="main-content">
+    <header>
+      <h4>Painel da Cooperativa</h4>
+      <div class="user-info">
+        <span>Bem-vinda, Katy</span>
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Usuário">
+      </div>
+    </header>
+
+    <main>
+      <div class="form-container">
+        <h5><i class="bi bi-seedling me-2"></i> Solicitar Sementes</h5>
+
+        <form id="seedForm">
+          <div class="row">
+            <div class="col-md-6">
+              <label for="tipoSemente">Tipo de Semente</label>
+              <select id="tipoSemente" required>
+                <option value="">Selecione</option>
+                <option>Feijão Carioca</option>
+                <option>Milho Verde</option>
+                <option>Mandioca</option>
+                <option>Arroz</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="quantidade">Quantidade Solicitada (kg)</label>
+              <input type="number" id="quantidade" placeholder="Ex: 50" required>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <label for="data">Data Prevista</label>
+              <input type="date" id="data">
+            </div>
+            <div class="col-md-6">
+              <label for="justificativa">Justificativa</label>
+              <input type="text" id="justificativa" placeholder="Ex: Reposição de estoque">
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <label for="observacao">Observações (opcional)</label>
+            <textarea id="observacao" rows="3" placeholder="Ex: Pedido para próxima safra"></textarea>
+          </div>
+
+          <button type="submit" class="btn-success mt-3">
+            <i class="bi bi-send"></i> Enviar Solicitação
+          </button>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const sidebar = document.getElementById("sidebar");
+    const mainContent = document.getElementById("main-content");
+    const toggleBtn = document.getElementById("toggle-btn");
+
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("collapsed");
+      mainContent.classList.toggle("expanded");
+    });
+
+    document.getElementById("seedForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      alert("🌱 Solicitação de sementes enviada com sucesso!");
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>
+
+
+
+
