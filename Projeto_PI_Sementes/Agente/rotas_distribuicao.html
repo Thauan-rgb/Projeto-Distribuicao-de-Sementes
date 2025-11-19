@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Semeia Web - Rotas de Distribuição</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    :root {
+      --cor-primaria: #2e7d32;
+      --cor-secundaria: #4caf50;
+      --cor-fundo: #f4f6f5;
+      --texto-principal: #333;
+      --branco: #fff;
+      --verde-claro: #e8f5e8;
+      --verde-escuro: #0d5032;
+      --verde-primario: #146c43;
+      --cinza-claro: #f8f9fa;
+      --cinza-medio: #e9ecef;
+    }
+
+    body {
+      background-color: #f5f7f5;
+      font-family: "Poppins", "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+
+    /* ===== Sidebar ===== */
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+      background-color: #146c43;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 10px;
+      position: fixed;
+      transition: width 0.3s ease;
+      overflow: hidden;
+      z-index: 1000;
+    }
+
+    .sidebar.collapsed { width: 80px; }
+
+    .toggler {
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #fff;
+      align-self: flex-start;
+      margin-bottom: 15px;
+      margin-left: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed .toggler {
+      align-self: center;
+      margin: 15px 0;
+    }
+
+    .toggler:hover { transform: scale(1.1); }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .logo img { width: 45px; transition: all 0.3s ease; }
+    .logo h4 { margin: 8px 0 0 0; color: #fff; transition: opacity 0.3s ease; }
+
+    .sidebar.collapsed .logo h4 {
+      opacity: 0;
+      height: 0;
+      overflow: hidden;
+    }
+
+    .profile {
+      text-align: center;
+      margin-bottom: 30px;
+      transition: all 0.3s ease;
+    }
+
+    .profile img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid white;
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed .profile img {
+      width: 45px;
+      height: 45px;
+    }
+
+    .sidebar.collapsed .profile h6 {
+      display: none;
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.3s ease, padding 0.3s ease;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active { background-color: #0d5032; }
+
+    .sidebar.collapsed a {
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .sidebar.collapsed a span { display: none; }
+
+    .logout {
+      margin-top: auto;
+      width: 100%;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      padding-top: 15px;
+    }
+
+    .logout a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      transition: background 0.3s ease;
+    }
+
+    .logout a:hover { background-color: #0d5032; }
+
+    .sidebar.collapsed .logout a {
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .sidebar.collapsed .logout a span { display: none; }
+
+    /* ===== Conteúdo Principal ===== */
+    .main-content {
+      margin-left: 250px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: margin-left 0.3s ease, width 0.3s ease;
+      width: calc(100% - 250px);
+    }
+
+    .sidebar.collapsed ~ .main-content {
+      margin-left: 80px;
+      width: calc(100% - 80px);
+    }
+
+    header {
+      background-color: var(--branco);
+      padding: 15px 25px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h4 { margin: 0; color: var(--texto-principal); }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-info img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+    }
+
+    main {
+      flex: 1;
+      padding: 25px;
+      background-color: var(--cor-fundo);
+    }
+
+    /* ===== Layout da Página ===== */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .page-title {
+      color: #064420;
+      font-weight: 700;
+      margin-bottom: 0;
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .page-title i {
+      color: var(--verde-primario);
+    }
+
+    .btn-custom {
+      background: var(--verde-primario);
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-custom:hover {
+      background: var(--verde-escuro);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline-custom {
+      border: 2px solid var(--verde-primario);
+      color: var(--verde-primario);
+      background: white;
+      padding: 10px 25px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline-custom:hover {
+      background: var(--verde-claro);
+    }
+
+    /* ===== Cards de Rotas ===== */
+    .routes-container {
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 25px;
+      height: calc(100vh - 200px);
+    }
+
+    @media (max-width: 1200px) {
+      .routes-container {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+    }
+
+    .routes-list {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      overflow-y: auto;
+    }
+
+    .routes-list-header {
+      display: flex;
+      justify-content: between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .routes-list-header h5 {
+      margin: 0;
+      color: var(--texto-principal);
+      font-weight: 600;
+    }
+
+    .search-box {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 10px 15px 10px 40px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+    }
+
+    .route-card {
+      background: var(--cinza-claro);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-left: 4px solid var(--verde-primario);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .route-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .route-card.active {
+      background: var(--verde-claro);
+      border-left-color: var(--verde-escuro);
+    }
+
+    .route-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .route-title {
+      font-weight: 600;
+      color: var(--texto-principal);
+      margin-bottom: 5px;
+    }
+
+    .route-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .badge-active { background: #d4edda; color: #155724; }
+    .badge-completed { background: #e2e3e5; color: #383d41; }
+    .badge-pending { background: #fff3cd; color: #856404; }
+
+    .route-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .route-stats {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-weight: 700;
+      color: var(--verde-primario);
+      font-size: 1.1rem;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    /* ===== Mapa ===== */
+    .map-container {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      position: relative;
+    }
+
+    .map-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .map-header h5 {
+      margin: 0;
+      color: var(--texto-principal);
+      font-weight: 600;
+    }
+
+    .map-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    #map {
+      height: 500px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    /* ===== Detalhes da Rota ===== */
+    .route-details {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      margin-top: 25px;
+    }
+
+    .details-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--cinza-medio);
+    }
+
+    .details-header h5 {
+      margin: 0;
+      color: var(--texto-principal);
+      font-weight: 600;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .detail-label {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 5px;
+    }
+
+    .detail-value {
+      font-weight: 600;
+      color: var(--texto-principal);
+    }
+
+    .deliveries-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .delivery-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      border-bottom: 1px solid var(--cinza-medio);
+      transition: background 0.3s ease;
+    }
+
+    .delivery-item:hover {
+      background: var(--verde-claro);
+    }
+
+    .delivery-item:last-child {
+      border-bottom: none;
+    }
+
+    .delivery-checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      border: 2px solid #ddd;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .delivery-checkbox.checked {
+      background: var(--verde-primario);
+      border-color: var(--verde-primario);
+      color: white;
+    }
+
+    .delivery-info {
+      flex: 1;
+    }
+
+    .delivery-name {
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+
+    .delivery-address {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 3px;
+    }
+
+    .delivery-lote {
+      font-size: 0.8rem;
+      color: #999;
+    }
+
+    .delivery-status {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      border-radius: 10px;
+    }
+
+    /* ===== Filtros ===== */
+    .filters-container {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      margin-bottom: 25px;
+    }
+
+    .filters-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    /* Status badges */
+    .badge-status {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .badge-pendente { background-color: #fff3cd; color: #856404; }
+    .badge-em-rota { background-color: #d1ecf1; color: #0c5460; }
+    .badge-entregue { background-color: #d4edda; color: #155724; }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .routes-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .filters-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ===== Sidebar ===== -->
+  <div class="sidebar" id="sidebar">
+    <i class="bi bi-list toggler" id="toggle-btn"></i>
+
+    <div class="logo">
+      <img src="img/logo2.png" alt="Semeia Web">
+      <h4>Semeia Web</h4>
+    </div>
+
+    <div class="profile">
+      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Usuário">
+      <h6>João Silva</h6>
+    </div>
+
+    <a href="dashboard_agente.html"><i class="bi bi-house-fill"></i><span>Início</span></a>
+    <a href="registrar_entrega.html"><i class="bi bi-check-circle"></i><span>Registrar Entrega</span></a>
+    <a href="rotas_distribuicao.html" class="active"><i class="bi bi-geo-alt"></i><span>Rotas de Distribuição</span></a>
+    <a href="ordens_expedicao.html"><i class="bi bi-clipboard-check"></i><span>Ordens de Expedição</span></a>
+    <a href="historico_entregas.html"><i class="bi bi-clock-history"></i><span>Histórico de Entregas</span></a>
+    <a href="rastreamento.html"><i class="bi bi-search"></i><span>Rastreamento</span></a>
+    <a href="notificacoes.html" class="notification-item"><i class="bi bi-bell"></i><span>Notificações</span></a>
+    <a href="configuracao.html"><i class="bi bi-gear"></i><span>Configurações</span></a>
+
+    <div class="logout">
+      <a href="../login.html"><i class="bi bi-box-arrow-right"></i><span>Sair</span></a>
+    </div>
+  </div>
+
+  <!-- ===== Conteúdo Principal ===== -->
+  <div class="main-content">
+    <header>
+      <h4>Rotas de Distribuição</h4>
+      <div class="user-info">
+        <span>João Silva</span>
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Usuário">
+      </div>
+    </header>
+
+    <main>
+      <div class="container-fluid">
+        <!-- Cabeçalho da Página -->
+        <div class="page-header">
+          <h1 class="page-title"><i class="bi bi-geo-alt"></i> Rotas de Distribuição</h1>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-custom" onclick="printRoute()">
+              <i class="bi bi-printer"></i> Imprimir Rota
+            </button>
+            <button class="btn btn-custom" onclick="startNavigation()">
+              <i class="bi bi-play-circle"></i> Iniciar Navegação
+            </button>
+          </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters-container">
+          <div class="filters-header">
+            <h5 class="mb-0">Filtros</h5>
+            <button class="btn btn-sm btn-outline-custom" onclick="clearFilters()">
+              <i class="bi bi-arrow-clockwise"></i> Limpar
+            </button>
+          </div>
+          <div class="filters-grid">
+            <div>
+              <label class="form-label">Status da Rota</label>
+              <select class="form-select" id="status-filter">
+                <option value="">Todos os status</option>
+                <option value="active">Ativa</option>
+                <option value="pending">Pendente</option>
+                <option value="completed">Concluída</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">Data</label>
+              <input type="date" class="form-control" id="date-filter">
+            </div>
+            <div>
+              <label class="form-label">Município</label>
+              <select class="form-select" id="municipio-filter">
+                <option value="">Todos os municípios</option>
+                <option value="petrolina">Petrolina</option>
+                <option value="lagoa-grande">Lagoa Grande</option>
+                <option value="santa-maria">Santa Maria da Boa Vista</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">Ordenar por</label>
+              <select class="form-select" id="sort-filter">
+                <option value="priority">Prioridade</option>
+                <option value="date">Data</option>
+                <option value="distance">Distância</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Container Principal -->
+        <div class="routes-container">
+          <!-- Lista de Rotas -->
+          <div class="routes-list">
+            <div class="routes-list-header">
+              <h5>Minhas Rotas</h5>
+              <span class="text-muted">3 rotas encontradas</span>
+            </div>
+
+            <div class="search-box">
+              <i class="bi bi-search"></i>
+              <input type="text" placeholder="Buscar rotas..." id="route-search">
+            </div>
+
+            <!-- Cartões de Rota -->
+            <div class="route-card active" onclick="selectRoute(1)">
+              <div class="route-header">
+                <div>
+                  <div class="route-title">Rota Zona Rural - Petrolina</div>
+                  <div class="text-muted">Hoje • 08:00 - 16:00</div>
+                </div>
+                <span class="route-badge badge-active">Ativa</span>
+              </div>
+              <div class="route-info">
+                <div><i class="bi bi-geo-alt"></i> 45 km • 8 entregas</div>
+                <div><i class="bi bi-clock"></i> ~5 horas</div>
+              </div>
+              <div class="route-stats">
+                <div class="stat-item">
+                  <div class="stat-number">3</div>
+                  <div class="stat-label">Entregues</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">5</div>
+                  <div class="stat-label">Pendentes</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">60%</div>
+                  <div class="stat-label">Progresso</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="route-card" onclick="selectRoute(2)">
+              <div class="route-header">
+                <div>
+                  <div class="route-title">Rota Lagoa Grande</div>
+                  <div class="text-muted">Amanhã • 07:30 - 14:00</div>
+                </div>
+                <span class="route-badge badge-pending">Pendente</span>
+              </div>
+              <div class="route-info">
+                <div><i class="bi bi-geo-alt"></i> 68 km • 6 entregas</div>
+                <div><i class="bi bi-clock"></i> ~6 horas</div>
+              </div>
+              <div class="route-stats">
+                <div class="stat-item">
+                  <div class="stat-number">0</div>
+                  <div class="stat-label">Entregues</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">6</div>
+                  <div class="stat-label">Pendentes</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">0%</div>
+                  <div class="stat-label">Progresso</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="route-card" onclick="selectRoute(3)">
+              <div class="route-header">
+                <div>
+                  <div class="route-title">Rota Santa Maria da Boa Vista</div>
+                  <div class="text-muted">12/10/2024 • 09:00 - 17:00</div>
+                </div>
+                <span class="route-badge badge-completed">Concluída</span>
+              </div>
+              <div class="route-info">
+                <div><i class="bi bi-geo-alt"></i> 85 km • 10 entregas</div>
+                <div><i class="bi bi-clock"></i> ~7 horas</div>
+              </div>
+              <div class="route-stats">
+                <div class="stat-item">
+                  <div class="stat-number">10</div>
+                  <div class="stat-label">Entregues</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">0</div>
+                  <div class="stat-label">Pendentes</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">100%</div>
+                  <div class="stat-label">Progresso</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mapa e Detalhes -->
+          <div class="map-container">
+            <div class="map-header">
+              <h5>Visualização da Rota</h5>
+              <div class="map-actions">
+                <button class="btn btn-sm btn-outline-custom" onclick="zoomToFit()">
+                  <i class="bi bi-fullscreen"></i> Ajustar
+                </button>
+                <button class="btn btn-sm btn-outline-custom" onclick="toggleSatellite()">
+                  <i class="bi bi-map"></i> Satélite
+                </button>
+              </div>
+            </div>
+            <div id="map"></div>
+          </div>
+        </div>
+
+        <!-- Detalhes da Rota Selecionada -->
+        <div class="route-details">
+          <div class="details-header">
+            <h5>Detalhes da Rota - Zona Rural Petrolina</h5>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-outline-custom" onclick="optimizeRoute()">
+                <i class="bi bi-lightning"></i> Otimizar Rota
+              </button>
+              <button class="btn btn-sm btn-custom" onclick="shareRoute()">
+                <i class="bi bi-share"></i> Compartilhar
+              </button>
+            </div>
+          </div>
+
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Distância Total</span>
+              <span class="detail-value">45 km</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Tempo Estimado</span>
+              <span class="detail-value">5 horas</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Entregas Programadas</span>
+              <span class="detail-value">8 agricultores</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Carga Total</span>
+              <span class="detail-value">320 kg</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Veículo</span>
+              <span class="detail-value">Caminhonete - ABC1234</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Combustível Estimado</span>
+              <span class="detail-value">18 litros</span>
+            </div>
+          </div>
+
+          <h6 class="mb-3">Lista de Entregas</h6>
+          <div class="deliveries-list">
+            <div class="delivery-item">
+              <div class="delivery-checkbox checked">
+                <i class="bi bi-check"></i>
+              </div>
+              <div class="delivery-info">
+                <div class="delivery-name">Maria Santos</div>
+                <div class="delivery-address">Sítio São José, Zona Rural</div>
+                <div class="delivery-lote">Lote: #LT-2024-MIL-045 • 50kg Milho</div>
+              </div>
+              <span class="badge-status badge-entregue">Entregue</span>
+            </div>
+
+            <div class="delivery-item">
+              <div class="delivery-checkbox checked">
+                <i class="bi bi-check"></i>
+              </div>
+              <div class="delivery-info">
+                <div class="delivery-name">José Oliveira</div>
+                <div class="delivery-address">Fazenda Boa Esperança</div>
+                <div class="delivery-lote">Lote: #LT-2024-FEJ-028 • 30kg Feijão</div>
+              </div>
+              <span class="badge-status badge-entregue">Entregue</span>
+            </div>
+
+            <div class="delivery-item">
+              <div class="delivery-checkbox checked">
+                <i class="bi bi-check"></i>
+              </div>
+              <div class="delivery-info">
+                <div class="delivery-name">Antônio Lima</div>
+                <div class="delivery-address">Chácara Santa Fé</div>
+                <div class="delivery-lote">Lote: #LT-2024-ARR-015 • 40kg Arroz</div>
+              </div>
+              <span class="badge-status badge-entregue">Entregue</span>
+            </div>
+
+            <div class="delivery-item">
+              <div class="delivery-checkbox" onclick="toggleDelivery(this)">
+                <i class="bi bi-check" style="display: none;"></i>
+              </div>
+              <div class="delivery-info">
+                <div class="delivery-name">Francisco Silva</div>
+                <div class="delivery-address">Sítio Palmeiras</div>
+                <div class="delivery-lote">Lote: #LT-2024-MIL-052 • 60kg Milho</div>
+              </div>
+              <span class="badge-status badge-em-rota">Próxima</span>
+            </div>
+
+            <div class="delivery-item">
+              <div class="delivery-checkbox" onclick="toggleDelivery(this)">
+                <i class="bi bi-check" style="display: none;"></i>
+              </div>
+              <div class="delivery-info">
+                <div class="delivery-name">Pedro Costa</div>
+                <div class="delivery-address">Fazenda Nova Vida</div>
+                <div class="delivery-lote">Lote: #LT-2024-FEJ-035 • 35kg Feijão</div>
+              </div>
+              <span class="badge-status badge-pendente">Pendente</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Controle da sidebar
+    const sidebar = document.getElementById("sidebar");
+    const toggleBtn = document.getElementById("toggle-btn");
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("collapsed");
+    });
+
+    // Variáveis do mapa
+    let map = null;
+    let routeLayer = null;
+    let markers = [];
+
+    // Inicializar mapa
+    function initMap() {
+      map = L.map('map').setView([-9.3886, -40.5024], 12); // Coordenadas de Petrolina-PE
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      // Adicionar pontos de entrega (simulados)
+      const deliveryPoints = [
+        { lat: -9.3886, lng: -40.5024, name: "Base", type: "base" },
+        { lat: -9.3950, lng: -40.4950, name: "Maria Santos", type: "delivery" },
+        { lat: -9.3820, lng: -40.5100, name: "José Oliveira", type: "delivery" },
+        { lat: -9.3750, lng: -40.5200, name: "Antônio Lima", type: "delivery" },
+        { lat: -9.3650, lng: -40.5300, name: "Francisco Silva", type: "delivery" },
+        { lat: -9.3550, lng: -40.5400, name: "Pedro Costa", type: "delivery" }
+      ];
+
+      deliveryPoints.forEach((point, index) => {
+        let iconColor = point.type === 'base' ? 'red' : 'green';
+        let icon = L.divIcon({
+          html: `<div style="background-color: ${iconColor}; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>`,
+          className: 'custom-marker',
+          iconSize: [16, 16]
+        });
+
+        let marker = L.marker([point.lat, point.lng], { icon: icon })
+          .addTo(map)
+          .bindPopup(`<b>${point.name}</b><br>${point.type === 'base' ? 'Ponto de Partida' : 'Entrega'}`);
+        
+        markers.push(marker);
+      });
+
+      // Desenhar rota simulada
+      const routeCoordinates = deliveryPoints.map(point => [point.lat, point.lng]);
+      routeLayer = L.polyline(routeCoordinates, {
+        color: '#146c43',
+        weight: 4,
+        opacity: 0.7,
+        dashArray: '5, 10'
+      }).addTo(map);
+    }
+
+    // Inicializar mapa quando a página carregar
+    document.addEventListener('DOMContentLoaded', initMap);
+
+    // Funções de controle
+    function selectRoute(routeId) {
+      // Remover classe active de todos os cards
+      document.querySelectorAll('.route-card').forEach(card => {
+        card.classList.remove('active');
+      });
+      
+      // Adicionar classe active ao card selecionado
+      event.currentTarget.classList.add('active');
+      
+      // Atualizar detalhes da rota (simulação)
+      showToast(`Rota ${routeId} selecionada`, 'info');
+    }
+
+    function toggleDelivery(checkbox) {
+      checkbox.classList.toggle('checked');
+      const checkIcon = checkbox.querySelector('i');
+      checkIcon.style.display = checkbox.classList.contains('checked') ? 'block' : 'none';
+      
+      // Atualizar contadores (simulação)
+      updateRouteStats();
+    }
+
+    function updateRouteStats() {
+      // Simulação de atualização de estatísticas
+      const checkedCount = document.querySelectorAll('.delivery-checkbox.checked').length;
+      const totalCount = document.querySelectorAll('.delivery-checkbox').length;
+      const progress = Math.round((checkedCount / totalCount) * 100);
+      
+      // Atualizar card ativo
+      const activeCard = document.querySelector('.route-card.active');
+      if (activeCard) {
+        activeCard.querySelector('.stat-number:nth-child(1)').textContent = checkedCount;
+        activeCard.querySelector('.stat-number:nth-child(3)').textContent = `${progress}%`;
+      }
+    }
+
+    function startNavigation() {
+      showToast('Navegação iniciada! Abrindo aplicativo de mapas...', 'success');
+      // Em um ambiente real, isso abriria o Google Maps/Waze com a rota
+    }
+
+    function printRoute() {
+      showToast('Preparando impressão da rota...', 'info');
+      // Em um ambiente real, isso geraria um PDF da rota
+    }
+
+    function optimizeRoute() {
+      showToast('Otimizando rota para melhor eficiência...', 'info');
+      // Simular otimização
+      setTimeout(() => {
+        showToast('Rota otimizada! Economia de 15% no tempo estimado.', 'success');
+      }, 1500);
+    }
+
+    function shareRoute() {
+      showToast('Link de compartilhamento copiado!', 'success');
+      // Em um ambiente real, isso copiaria um link para a área de transferência
+    }
+
+    function zoomToFit() {
+      if (map && routeLayer) {
+        map.fitBounds(routeLayer.getBounds());
+      }
+    }
+
+    function toggleSatellite() {
+      showToast('Alternando visualização do mapa...', 'info');
+      // Em um ambiente real, isso alternaria entre mapa e satélite
+    }
+
+    function clearFilters() {
+      document.getElementById('status-filter').value = '';
+      document.getElementById('date-filter').value = '';
+      document.getElementById('municipio-filter').value = '';
+      document.getElementById('sort-filter').value = 'priority';
+      showToast('Filtros limpos!', 'info');
+    }
+
+    // Função utilitária para mostrar toasts
+    function showToast(message, type = 'info') {
+      // Criar toast dinamicamente
+      const toastContainer = document.createElement('div');
+      toastContainer.innerHTML = `
+        <div class="toast align-items-center text-white bg-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} border-0 show" role="alert">
+          <div class="d-flex">
+            <div class="toast-body">
+              <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+              ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+          </div>
+        </div>
+      `;
+      
+      toastContainer.style.position = 'fixed';
+      toastContainer.style.top = '20px';
+      toastContainer.style.right = '20px';
+      toastContainer.style.zIndex = '9999';
+      
+      document.body.appendChild(toastContainer);
+      
+      // Remover após 3 segundos
+      setTimeout(() => {
+        document.body.removeChild(toastContainer);
+      }, 3000);
+    }
+
+    // Busca em tempo real
+    document.getElementById('route-search').addEventListener('input', function(e) {
+      const searchTerm = e.target.value.toLowerCase();
+      const routeCards = document.querySelectorAll('.route-card');
+      
+      routeCards.forEach(card => {
+        const title = card.querySelector('.route-title').textContent.toLowerCase();
+        if (title.includes(searchTerm)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
