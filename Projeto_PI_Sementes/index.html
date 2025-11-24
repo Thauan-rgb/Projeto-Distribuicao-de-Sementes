@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Semeia Web - Gestão de Distribuição de Sementes</title>
+
+  <!-- Bootstrap 5.3.8 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" 
+        rel="stylesheet" 
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" 
+        crossorigin="anonymous">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --verde-primario: #146c43;
+      --verde-escuro: #0d5032;
+      --verde-claro: #e8f5e8;
+      --branco: #ffffff;
+      --cinza-claro: #f8f9fa;
+      --texto-escuro: #333333;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--texto-escuro);
+      line-height: 1.6;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: linear-gradient(135deg, var(--verde-primario), var(--verde-escuro)) !important;
+      padding: 1rem 0;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+
+    .navbar-brand {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    .nav-link {
+      font-weight: 500;
+      margin: 0 0.5rem;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--verde-claro) !important;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, rgba(20, 108, 67, 0.9), rgba(13, 80, 50, 0.9)), 
+                  url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      min-height: 100vh;
+      padding-top: 80px;
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .hero p {
+      font-size: 1.3rem;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .btn-hero {
+      background: var(--branco);
+      color: var(--verde-primario);
+      padding: 15px 40px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border-radius: 50px;
+      border: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .btn-hero:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      background: var(--verde-claro);
+    }
+
+    /* Sections */
+    section {
+      padding: 80px 0;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: var(--verde-primario);
+      border-radius: 2px;
+    }
+
+    /* Cards */
+    .card {
+      border: none;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+    }
+
+    .card-img-top {
+      height: 200px;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover .card-img-top {
+      transform: scale(1.05);
+    }
+
+    .card-body {
+      padding: 2rem;
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--verde-primario);
+      margin-bottom: 1rem;
+    }
+
+    /* About Section */
+    .quem {
+      background: linear-gradient(135deg, var(--cinza-claro), var(--branco));
+    }
+
+    .about-box {
+      background: var(--branco);
+      border-radius: 20px;
+      padding: 3rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      border-left: 5px solid var(--verde-primario);
+    }
+
+    /* Features Section */
+    .feature-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--verde-claro);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 2rem;
+      color: var(--verde-primario);
+    }
+
+    /* Contact Section */
+    .caixa {
+      background: linear-gradient(135deg, var(--verde-primario), var(--verde-escuro));
+      padding: 80px 0;
+    }
+
+    .btn-contact {
+      background: var(--branco);
+      color: var(--verde-primario);
+      padding: 15px 40px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 50px;
+      border: 2px solid var(--branco);
+      transition: all 0.3s ease;
+    }
+
+    .btn-contact:hover {
+      background: transparent;
+      color: var(--branco);
+      transform: translateY(-3px);
+    }
+
+    /* Footer */
+    footer {
+      background: #1a1a1a;
+      padding: 2rem 0;
+    }
+
+    /* Estilos para o modal de contato */
+    .modal-content {
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .form-control {
+      border-radius: 8px;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--verde-primario);
+      box-shadow: 0 0 0 0.2rem rgba(20, 108, 67, 0.25);
+    }
+
+    .btn-close:focus {
+      box-shadow: none;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+      
+      .hero p {
+        font-size: 1.1rem;
+      }
+      
+      .section-title {
+        font-size: 2rem;
+      }
+      
+      .card {
+        margin-bottom: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <i class="bi bi-tree-fill me-2"></i>Semeia Web
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#sobre-nos">Sobre</a></li>
+          <li class="nav-item"><a class="nav-link" href="#projetos">Funcionalidades</a></li>
+          <li class="nav-item"><a class="nav-link" href="#logistica">Logística</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero d-flex align-items-center text-center text-white">
+    <div class="container fade-in">
+      <h1>Transparência e gestão que germinam resultados</h1>
+      <p>Usado por gestores, técnicos e agricultores em todo o estado, o Semeia Web é uma plataforma online que transforma a gestão do Programa de Distribuição de Sementes.</p>
+      <a href="login.html" class="btn btn-hero">
+        <i class="bi bi-box-arrow-in-right me-2"></i>Faça seu login aqui
+      </a>
+    </div>
+  </header>
+
+  <!-- Sobre Nós -->
+  <section id="sobre-nos" class="py-5 bg-light quem">
+    <div class="container text-center fade-in">
+      <h2 class="section-title text-success">Quem Somos?</h2>
+      <div class="about-box">
+        <p class="lead text-secondary mb-4">
+          Somos estudantes da <strong class="text-success">Faculdade Senac</strong>, desenvolvendo este 
+          <strong class="text-success">Projeto Integrador (PI)</strong> com foco em <strong class="text-success">logística</strong> e 
+          <strong class="text-success">transparência</strong> para programas de distribuição de sementes.
+        </p>
+        <p class="text-muted mb-0">
+          Nosso objetivo é validar um sistema web que gerencie o estoque, rastreie lotes e garanta 
+          a transparência pública dos resultados, promovendo eficiência e confiança na distribuição de sementes.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Funcionalidades -->
+  <section id="projetos" class="py-5">
+    <div class="container">
+      <div class="text-center mb-5 fade-in">
+        <h2 class="section-title">O Que Oferecemos?</h2>
+        <p class="lead text-muted">Soluções completas para gestão eficiente de distribuição de sementes</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-3 fade-in">
+          <div class="card h-100 shadow border-0">
+            <div class="feature-icon">
+              <i class="bi bi-qr-code-scan"></i>
+            </div>
+            <div class="card-body text-center">
+              <h5 class="card-title">Rastreabilidade Completa</h5>
+              <p class="card-text text-muted">Acompanhe o histórico completo de cada lote de semente com QR Code, desde o armazém até o agricultor final, garantindo total transparência.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3 fade-in">
+          <div class="card h-100 shadow border-0">
+            <div class="feature-icon">
+              <i class="bi bi-graph-up-arrow"></i>
+            </div>
+            <div class="card-body text-center">
+              <h5 class="card-title">Controle Logístico Inteligente</h5>
+              <p class="card-text text-muted">Sistema automatizado de estoque com triggers que impedem saldo negativo, garantindo precisão e eficiência nas movimentações.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3 fade-in">
+          <div class="card h-100 shadow border-0">
+            <div class="feature-icon">
+              <i class="bi bi-eye"></i>
+            </div>
+            <div class="card-body text-center">
+              <h5 class="card-title">Transparência Pública</h5>
+              <p class="card-text text-muted">Painel público com resultados agregados da distribuição, assegurando responsabilidade e permitindo fiscalização em tempo real.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3 fade-in">
+          <div class="card h-100 shadow border-0">
+            <div class="feature-icon">
+              <i class="bi bi-person-badge"></i>
+            </div>
+            <div class="card-body text-center">
+              <h5 class="card-title">Perfis Personalizados</h5>
+              <p class="card-text text-muted">Controle rigoroso de acesso com permissões específicas para Gestores, Operadores e Agentes de Campo, garantindo segurança dos dados.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Logística -->
+  <section id="logistica" class="py-5 bg-light">
+    <div class="container">
+      <div class="text-center mb-5 fade-in">
+        <h2 class="section-title">
+          O programa de sementes em suas mãos:
+          <span class="text-success">Controle, Logística e Transparência</span>
+        </h2>
+      </div>
+
+      <div class="row align-items-center">
+        <div class="col-lg-6 mb-4 mb-lg-0 fade-in">
+          <div class="position-relative">
+            <img src="https://images.unsplash.com/photo-1586773860418-d37222d8fce3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                 alt="Sistema de gestão de sementes" 
+                 class="img-fluid rounded-3 shadow-lg">
+            <div class="position-absolute top-0 start-0 m-3">
+              <span class="badge bg-success fs-6 p-2">Sistema 100% Web</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6 fade-in">
+          <div class="p-4 p-lg-5 bg-white rounded-3 shadow-sm">
+            <h4 class="text-success mb-4">Gestão Integrada e Eficiente</h4>
+            <p class="mb-4">
+              Nosso sistema web foi projetado para validar a gestão eficiente do 
+              <strong class="text-success">Programa de Aquisição e Distribuição de Sementes</strong>,
+              integrando tecnologia e processos para otimização completa.
+            </p>
+            
+            <div class="row mb-4">
+              <div class="col-6">
+                <div class="d-flex align-items-center mb-3">
+                  <i class="bi bi-check-circle-fill text-success me-2"></i>
+                  <span>Controle de estoque</span>
+                </div>
+                <div class="d-flex align-items-center mb-3">
+                  <i class="bi bi-check-circle-fill text-success me-2"></i>
+                  <span>Logística inteligente</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex align-items-center mb-3">
+                  <i class="bi bi-check-circle-fill text-success me-2"></i>
+                  <span>Rastreabilidade</span>
+                </div>
+                <div class="d-flex align-items-center mb-3">
+                  <i class="bi bi-check-circle-fill text-success me-2"></i>
+                  <span>Transparência pública</span>
+                </div>
+              </div>
+            </div>
+
+            <p class="mb-0">
+              Garantimos que as sementes cheguem ao agricultor de forma transparente e no prazo,
+              apoiando a entrega a destinatários como agricultores de base familiar e cooperativas.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contato -->
+  <section id="contato" class="caixa text-white">
+    <div class="container text-center py-5 fade-in">
+      <h2 class="display-5 fw-bold mb-4">Pronto para modernizar a gestão do seu programa de sementes?</h2>
+      <p class="lead mb-5">Descubra como nosso sistema pode otimizar a distribuição, garantir a rastreabilidade e impulsionar a transparência para seus agricultores e parceiros.</p>
+      <a href="#" class="btn btn-contact" data-bs-toggle="modal" data-bs-target="#contatoModal">
+        <i class="bi bi-chat-dots me-2"></i>Fale Conosco!
+      </a>
+    </div>
+  </section>
+
+  <!-- Rodapé -->
+  <footer class="py-4">
+    <div class="container text-center">
+      <div class="mb-3">
+        <i class="bi bi-tree-fill text-success fs-4 me-2"></i>
+        <span class="fw-bold text-white">Semeia Web</span>
+      </div>
+      <small class="text-white-50">© 2025 Semeia Web | Desenvolvido por alunos do Senac PE</small>
+    </div>
+  </footer>
+
+  <!-- Modal de Contato -->
+  <div class="modal fade" id="contatoModal" tabindex="-1" aria-labelledby="contatoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="contatoModalLabel">
+            <i class="bi bi-chat-dots me-2"></i>Fale Conosco
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="formContato">
+            <div class="mb-3">
+              <label for="nome" class="form-label">Nome Completo</label>
+              <input type="text" class="form-control" id="nome" required>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">E-mail</label>
+              <input type="email" class="form-control" id="email" required>
+            </div>
+            <div class="mb-3">
+              <label for="telefone" class="form-label">Telefone</label>
+              <input type="tel" class="form-control" id="telefone">
+            </div>
+            <div class="mb-3">
+              <label for="mensagem" class="form-label">Mensagem</label>
+              <textarea class="form-control" id="mensagem" rows="4" required></textarea>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-success btn-lg">
+                <i class="bi bi-send me-2"></i>Enviar Mensagem
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5.3.8 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" 
+          integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" 
+          crossorigin="anonymous"></script>
+
+  <script>
+    // Smooth scroll para navegação
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > 100) {
+        document.querySelector('.navbar').style.padding = '0.5rem 0';
+        document.querySelector('.navbar').style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+      } else {
+        document.querySelector('.navbar').style.padding = '1rem 0';
+        document.querySelector('.navbar').style.boxShadow = '0 2px 15px rgba(0,0,0,0.1)';
+      }
+    });
+
+    // Animation on scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.fade-in').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(30px)';
+      el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      observer.observe(el);
+    });
+
+    // Formulário de contato
+    document.getElementById('formContato').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Simulação de envio do formulário
+      const nome = document.getElementById('nome').value;
+      const email = document.getElementById('email').value;
+      
+      // Fechar o modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('contatoModal'));
+      modal.hide();
+      
+      // Exibir mensagem de sucesso
+      alert(`Obrigado, ${nome}! Sua mensagem foi enviada com sucesso. Entraremos em contato através do e-mail: ${email} em breve.`);
+      
+      // Limpar formulário
+      document.getElementById('formContato').reset();
+    });
+  </script>
+</body>
+</html>

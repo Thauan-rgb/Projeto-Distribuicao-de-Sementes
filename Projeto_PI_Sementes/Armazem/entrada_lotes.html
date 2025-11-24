@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Semeia Web - Entrada de Lotes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --cor-primaria: #2e7d32;
+      --cor-secundaria: #4caf50;
+      --cor-fundo: #f4f6f5;
+      --texto-principal: #333;
+      --branco: #fff;
+      --verde-claro: #e8f5e8;
+      --verde-escuro: #0d5032;
+      --verde-primario: #146c43;
+      --cinza-claro: #f8f9fa;
+      --cinza-medio: #e9ecef;
+    }
+
+    body {
+      background-color: #f5f7f5;
+      font-family: "Poppins", "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+
+    /* ===== Sidebar ===== */
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+      background-color: #146c43;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 10px;
+      position: fixed;
+      transition: width 0.3s ease;
+      overflow: hidden;
+      z-index: 1000;
+    }
+
+    .sidebar.collapsed { width: 80px; }
+
+    .toggler {
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #fff;
+      align-self: flex-start;
+      margin-bottom: 15px;
+      margin-left: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed .toggler {
+      align-self: center;
+      margin: 15px 0;
+    }
+
+    .toggler:hover { transform: scale(1.1); }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .logo img { width: 45px; transition: all 0.3s ease; }
+    .logo h4 { margin: 8px 0 0 0; color: #fff; transition: opacity 0.3s ease; }
+
+    .sidebar.collapsed .logo h4 {
+      opacity: 0;
+      height: 0;
+      overflow: hidden;
+    }
+
+    .profile {
+      text-align: center;
+      margin-bottom: 30px;
+      transition: all 0.3s ease;
+    }
+
+    .profile img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid white;
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed .profile img {
+      width: 45px;
+      height: 45px;
+    }
+
+    .sidebar.collapsed .profile h6 {
+      display: none;
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.3s ease, padding 0.3s ease;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active { background-color: #0d5032; }
+
+    .sidebar.collapsed a {
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .sidebar.collapsed a span { display: none; }
+
+    .logout {
+      margin-top: auto;
+      width: 100%;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      padding-top: 15px;
+    }
+
+    .logout a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      transition: background 0.3s ease;
+    }
+
+    .logout a:hover { background-color: #0d5032; }
+
+    .sidebar.collapsed .logout a {
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .sidebar.collapsed .logout a span { display: none; }
+
+    /* ===== Conteúdo Principal ===== */
+    .main-content {
+      margin-left: 250px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: margin-left 0.3s ease, width 0.3s ease;
+      width: calc(100% - 250px);
+    }
+
+    .sidebar.collapsed ~ .main-content {
+      margin-left: 80px;
+      width: calc(100% - 80px);
+    }
+
+    header {
+      background-color: var(--branco);
+      padding: 15px 25px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h4 { margin: 0; color: var(--texto-principal); }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-info img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+    }
+
+    main {
+      flex: 1;
+      padding: 25px;
+      background-color: var(--cor-fundo);
+    }
+
+    /* ===== Estilos da Tela de Entrada ===== */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .page-title {
+      color: #064420;
+      font-weight: 700;
+      margin-bottom: 0;
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .page-title i {
+      color: var(--verde-primario);
+    }
+
+    /* ESTILO DO FILTRO DE ARMAZÉM - IGUAL AO DASHBOARD */
+    .date-filter {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .date-filter select {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 8px 12px;
+      background: white;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .form-container {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      margin-bottom: 30px;
+    }
+
+    .form-section {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--cinza-medio);
+    }
+
+    .form-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--verde-primario);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: #064420;
+      margin-bottom: 8px;
+    }
+
+    .form-control, .form-select {
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      padding: 10px 12px;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--verde-primario);
+      box-shadow: 0 0 0 0.2rem rgba(20, 108, 67, 0.25);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--verde-primario), var(--verde-escuro));
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--verde-escuro), #064420);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline-secondary {
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-weight: 600;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      justify-content: flex-end;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid var(--cinza-medio);
+    }
+
+    /* QR Code Section */
+    .qr-section {
+      background: var(--verde-claro);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .qr-placeholder {
+      width: 200px;
+      height: 200px;
+      background: white;
+      border: 2px dashed #ddd;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px;
+      cursor: pointer;
+    }
+
+    .qr-placeholder i {
+      font-size: 3rem;
+      color: #999;
+    }
+
+    /* Lote Info Card */
+    .lote-info-card {
+      background: var(--cinza-claro);
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .lote-info-item {
+      display: flex;
+      justify-content: between;
+      margin-bottom: 8px;
+    }
+
+    .lote-info-label {
+      font-weight: 600;
+      color: #064420;
+      min-width: 120px;
+    }
+
+    .lote-info-value {
+      color: #666;
+    }
+
+    /* Alert Styles */
+    .alert-custom {
+      border-radius: 8px;
+      border: none;
+      padding: 15px 20px;
+    }
+
+    /* Recent Entries */
+    .recent-entries {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .table th {
+      background: var(--verde-claro);
+      color: var(--verde-primario);
+      font-weight: 600;
+      border: none;
+    }
+
+    .table td {
+      vertical-align: middle;
+      border-color: var(--cinza-medio);
+    }
+
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .status-active {
+      background: rgba(46, 204, 113, 0.1);
+      color: #27ae60;
+    }
+
+    .status-pending {
+      background: rgba(241, 196, 15, 0.1);
+      color: #f39c12;
+    }
+
+    @media (max-width: 768px) {
+      .form-actions {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ===== Sidebar ===== -->
+  <div class="sidebar" id="sidebar">
+    <i class="bi bi-list toggler" id="toggle-btn"></i>
+
+    <div class="logo">
+      <img src="img/logo2.png" alt="Semeia Web">
+      <h4>Semeia Web</h4>
+    </div>
+
+    <div class="profile">
+      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Usuário">
+      <h6>Carlos Silva</h6>
+    </div>
+
+    <a href="dashboard_operador.html"><i class="bi bi-house-fill"></i><span>Início</span></a>
+    <a href="entrada_lotes.html" class="active"><i class="bi bi-box-arrow-in-down"></i><span>Entrada de Lotes</span></a>
+    <a href="expedicao.html"><i class="bi bi-truck"></i><span>Expedição</span></a>
+    <a href="transferencia.html"><i class="bi bi-arrow-left-right"></i><span>Transferência</span></a>
+    <a href="estoque.html"><i class="bi bi-box-seam"></i><span>Estoque</span></a>
+    <a href="relatorios.html"><i class="bi bi-file-earmark-text"></i><span>Relatórios</span></a>
+    <a href="notificacoes.html" class="notification-item"><i class="bi bi-bell"></i><span>Notificações</span></a>
+    <a href="configuracao.html"><i class="bi bi-gear"></i><span>Configurações</span></a>
+
+    <div class="logout">
+      <a href="../login.html"><i class="bi bi-box-arrow-right"></i><span>Sair</span></a>
+    </div>
+  </div>
+
+  <!-- ===== Conteúdo Principal ===== -->
+  <div class="main-content">
+    <header>
+      <h4>Entrada de Lotes</h4>
+      <div class="user-info">
+        <span>Carlos Silva</span>
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Usuário">
+      </div>
+    </header>
+
+    <main>
+      <div class="container-fluid">
+        <!-- Cabeçalho da Página -->
+        <div class="page-header">
+          <h1 class="page-title"><i class="bi bi-box-arrow-in-down"></i> Registrar Entrada de Lote</h1>
+          <div class="date-filter">
+            <span>Armazém: Petrolina</span> 
+          </div>
+        </div>
+
+        <!-- Alert de Informação -->
+        <div class="alert alert-info alert-custom">
+          <i class="bi bi-info-circle-fill"></i>
+          <strong>Informação:</strong> Preencha todos os campos obrigatórios para registrar a entrada do lote. O sistema gerará automaticamente um QR Code para rastreamento.
+        </div>
+
+        <!-- Formulário Principal -->
+        <div class="form-container">
+          <form id="formEntradaLote">
+            <!-- Seção: Informações Básicas do Lote -->
+            <div class="form-section">
+              <h3 class="section-title"><i class="bi bi-card-checklist"></i> Informações do Lote</h3>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Número do Lote <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" placeholder="Ex: LOT-2024-001" required>
+                  <div class="form-text">Número único de identificação do lote</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Espécie <span class="text-danger">*</span></label>
+                  <select class="form-select" required>
+                    <option value="">Selecione a espécie...</option>
+                    <option value="milho">Milho</option>
+                    <option value="feijao">Feijão</option>
+                    <option value="arroz">Arroz</option>
+                    <option value="soja">Soja</option>
+                    <option value="trigo">Trigo</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Quantidade (kg) <span class="text-danger">*</span></label>
+                  <input type="number" class="form-control" placeholder="0" min="1" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Data de Validade <span class="text-danger">*</span></label>
+                  <input type="date" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Data de Recebimento <span class="text-danger">*</span></label>
+                  <input type="date" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seção: Origem e Destino -->
+            <div class="form-section">
+              <h3 class="section-title"><i class="bi bi-geo-alt"></i> Origem e Destino</h3>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Fornecedor <span class="text-danger">*</span></label>
+                  <select class="form-select" required>
+                    <option value="">Selecione o fornecedor...</option>
+                    <option value="forn1">Fornecedor A - Sementes Premium</option>
+                    <option value="forn2">Fornecedor B - AgroSementes</option>
+                    <option value="forn3">Fornecedor C - Rural Supply</option>
+                    <option value="outro">Outro fornecedor</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Armazém de Destino <span class="text-danger">*</span></label>
+                  <select class="form-select" required>
+                    <option value="central">Armazém Central</option>
+                    <option value="norte">Armazém Norte</option>
+                    <option value="sul">Armazém Sul</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Localização no Armazém</label>
+                  <input type="text" class="form-control" placeholder="Ex: Setor A, Prateleira 3">
+                  <div class="form-text">Opcional - local específico de armazenamento</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seção: Qualidade e Observações -->
+            <div class="form-section">
+              <h3 class="section-title"><i class="bi bi-clipboard-check"></i> Qualidade e Observações</h3>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label">Qualidade</label>
+                  <select class="form-select">
+                    <option value="excelente">Excelente</option>
+                    <option value="boa" selected>Boa</option>
+                    <option value="regular">Regular</option>
+                    <option value="problemas">Com problemas</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Taxa de Germinação (%)</label>
+                  <input type="number" class="form-control" placeholder="0" min="0" max="100">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Umidade (%)</label>
+                  <input type="number" class="form-control" placeholder="0" min="0" max="100" step="0.1">
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Observações</label>
+                  <textarea class="form-control" rows="3" placeholder="Observações sobre o lote, condições de recebimento, etc."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seção: QR Code -->
+            <div class="form-section">
+              <h3 class="section-title"><i class="bi bi-qr-code"></i> Rastreabilidade</h3>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="qr-section">
+                    <h5>QR Code do Lote</h5>
+                    <div class="qr-placeholder" onclick="gerarQRCode()">
+                      <i class="bi bi-qr-code"></i>
+                    </div>
+                    <p class="text-muted">Clique para gerar o QR Code de rastreamento</p>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="gerarQRCode()">
+                      <i class="bi bi-download"></i> Baixar QR Code
+                    </button>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="lote-info-card">
+                    <h6>Informações do QR Code</h6>
+                    <div class="lote-info-item">
+                      <span class="lote-info-label">Status:</span>
+                      <span class="lote-info-value">Não gerado</span>
+                    </div>
+                    <div class="lote-info-item">
+                      <span class="lote-info-label">Data de Geração:</span>
+                      <span class="lote-info-value">-</span>
+                    </div>
+                    <div class="lote-info-item">
+                      <span class="lote-info-label">Última Atualização:</span>
+                      <span class="lote-info-value">-</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ações do Formulário -->
+            <div class="form-actions">
+              <button type="button" class="btn btn-outline-secondary" onclick="limparFormulario()">
+                <i class="bi bi-x-circle"></i> Limpar
+              </button>
+              <button type="button" class="btn btn-outline-primary" onclick="salvarRascunho()">
+                <i class="bi bi-save"></i> Salvar Rascunho
+              </button>
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-lg"></i> Registrar Entrada
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Entradas Recentes -->
+        <div class="recent-entries">
+          <h5 class="section-title"><i class="bi bi-clock-history"></i> Entradas Recentes</h5>
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Lote</th>
+                  <th>Espécie</th>
+                  <th>Quantidade</th>
+                  <th>Fornecedor</th>
+                  <th>Data Receb.</th>
+                  <th>Validade</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>LOT-2024-025</strong></td>
+                  <td>Milho</td>
+                  <td>150 kg</td>
+                  <td>Fornecedor A</td>
+                  <td>15/11/2024</td>
+                  <td>15/05/2025</td>
+                  <td><span class="status-badge status-active">Ativo</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>LOT-2024-024</strong></td>
+                  <td>Feijão</td>
+                  <td>80 kg</td>
+                  <td>Fornecedor B</td>
+                  <td>14/11/2024</td>
+                  <td>14/08/2025</td>
+                  <td><span class="status-badge status-active">Ativo</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>LOT-2024-023</strong></td>
+                  <td>Arroz</td>
+                  <td>100 kg</td>
+                  <td>Fornecedor C</td>
+                  <td>13/11/2024</td>
+                  <td>13/07/2025</td>
+                  <td><span class="status-badge status-pending">Pendente</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Sidebar Toggle
+    const sidebar = document.getElementById("sidebar");
+    const toggleBtn = document.getElementById("toggle-btn");
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("collapsed");
+    });
+
+    // Filtro de armazém
+    document.getElementById('armazem').addEventListener('change', function() {
+      const armazem = this.options[this.selectedIndex].text;
+      alert(`Armazém alterado para: ${armazem}`);
+      // Aqui você implementaria a lógica para carregar dados do armazém selecionado
+    });
+
+    // Funções do Formulário
+    function gerarQRCode() {
+      const loteNumero = document.querySelector('input[type="text"]').value;
+      if (!loteNumero) {
+        alert('Por favor, preencha o número do lote antes de gerar o QR Code.');
+        return;
+      }
+      
+      const qrPlaceholder = document.querySelector('.qr-placeholder');
+      qrPlaceholder.innerHTML = `
+        <div class="text-success text-center">
+          <i class="bi bi-check-circle" style="font-size: 3rem;"></i>
+          <p class="mt-2 mb-0">QR Code Gerado</p>
+          <small>${loteNumero}</small>
+        </div>
+      `;
+      
+      // Atualizar informações do QR Code
+      document.querySelectorAll('.lote-info-value')[0].textContent = 'Gerado';
+      document.querySelectorAll('.lote-info-value')[1].textContent = new Date().toLocaleDateString();
+      document.querySelectorAll('.lote-info-value')[2].textContent = new Date().toLocaleString();
+      
+      alert('QR Code gerado com sucesso para o lote: ' + loteNumero);
+    }
+
+    function limparFormulario() {
+      if (confirm('Tem certeza que deseja limpar todos os campos?')) {
+        document.getElementById('formEntradaLote').reset();
+        const qrPlaceholder = document.querySelector('.qr-placeholder');
+        qrPlaceholder.innerHTML = '<i class="bi bi-qr-code"></i>';
+        
+        // Resetar informações do QR Code
+        document.querySelectorAll('.lote-info-value')[0].textContent = 'Não gerado';
+        document.querySelectorAll('.lote-info-value')[1].textContent = '-';
+        document.querySelectorAll('.lote-info-value')[2].textContent = '-';
+      }
+    }
+
+    function salvarRascunho() {
+      alert('Rascunho salvo com sucesso! Você pode continuar editando posteriormente.');
+    }
+
+    // Submit do Formulário
+    document.getElementById('formEntradaLote').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Validações básicas
+      const loteNumero = document.querySelector('input[type="text"]').value;
+      const especie = document.querySelector('select').value;
+      const quantidade = document.querySelector('input[type="number"]').value;
+      
+      if (!loteNumero || !especie || !quantidade) {
+        alert('Por favor, preencha todos os campos obrigatórios.');
+        return;
+      }
+      
+      // Simular envio para o servidor
+      alert(`Entrada de lote registrada com sucesso!\n\nLote: ${loteNumero}\nEspécie: ${especie}\nQuantidade: ${quantidade}kg`);
+      
+      // Limpar formulário após sucesso
+      this.reset();
+      limparFormulario();
+    });
+
+    // Validação em tempo real
+    document.querySelectorAll('input, select').forEach(element => {
+      element.addEventListener('blur', function() {
+        if (this.hasAttribute('required') && !this.value) {
+          this.classList.add('is-invalid');
+        } else {
+          this.classList.remove('is-invalid');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

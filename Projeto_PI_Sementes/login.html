@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Semeia Web - Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #e3f2e1, #f8faf8);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Inter", sans-serif;
+    }
+
+    .login-card {
+      background: #fff;
+      padding: 3rem 2.5rem;
+      border-radius: 1.25rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 420px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .login-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+    }
+
+    .login-logo {
+      display: block;
+      margin: 0 auto 1rem auto;
+      width: 80px;
+    }
+
+    .login-title {
+      text-align: center;
+      color: #1d4d2d;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-subtitle {
+      text-align: center;
+      color: #6c757d;
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .form-control {
+      border-radius: 0.75rem;
+      padding: 0.75rem;
+      font-size: 0.95rem;
+    }
+
+    .btn-login {
+      background-color: #2e7d32;
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      border-radius: 0.75rem;
+      padding: 0.75rem;
+      transition: background 0.3s ease;
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    .btn-login:hover {
+      background-color: #256526;
+    }
+
+    .govbr-logo {
+      display: block;
+      margin: 1.5rem auto 0 auto;
+      width: 120px;
+      opacity: 0.9;
+      transition: opacity 0.3s;
+    }
+
+    .govbr-logo:hover {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <img src="img/ipa.png" alt="Logo IPA" class="login-logo">
+    <h3 class="login-title">Sistema de Sementes</h3>
+    <p class="login-subtitle">Entre com sua conta Gov</p>
+
+    <form id="loginForm">
+      <div class="mb-3">
+        <input type="email" id="email" class="form-control" placeholder="Email gov" required>
+      </div>
+      <div class="mb-3">
+        <input type="password" id="senha" class="form-control" placeholder="Senha" required>
+      </div>
+      <button type="submit" class="btn btn-login">Entrar</button>
+    </form>
+
+    <img src="img/gov.png" alt="GOV.BR" class="govbr-logo">
+  </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+ event.preventDefault();
+
+ const email = document.getElementById("email").value.trim().toLowerCase();
+ const senha = document.getElementById("senha").value.trim();
+
+ if (email === "gerente@ipa.gov.br") {
+  window.location.href = "Gestor/dashboard_gerente.html";
+ } else if (email === "cooperativa@ipa.gov.br") {
+  window.location.href = "Cooperativa/dashboard_cooperativa.html"; 
+ } else if (email === "armazem@ipa.gov.br") {
+  window.location.href = "Armazem/dashboard_operador.html";
+ } else if (email === "agente@ipa.gov.br") {
+  window.location.href = "Agente/dashboard_agente.html";
+ } else {
+  alert("Usuário não encontrado. Verifique o e-mail gov.");
+ }
+});
+  </script>
+</body>
+</html>
