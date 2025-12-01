@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Semeia Web - Usuários</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --cor-primaria: #2e7d32;
+      --cor-secundaria: #4caf50;
+      --cor-fundo: #f4f6f5;
+      --texto-principal: #333;
+      --branco: #fff;
+      --verde-primario: #146c43;
+      --verde-escuro: #0d5032;
+    }
+
+    body {
+      background-color: #f5f7f5;
+      font-family: "Poppins", sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ===== Sidebar ===== */
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+      background-color: #146c43;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 10px;
+      position: fixed;
+      transition: width 0.3s ease;
+      overflow: hidden;
+    }
+
+    .sidebar.collapsed { width: 80px; }
+
+    .toggler {
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #fff;
+      align-self: flex-start;
+      margin-bottom: 15px;
+      margin-left: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed .toggler {
+      align-self: center;
+      margin: 15px 0;
+    }
+
+    .toggler:hover { transform: scale(1.1); }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .logo img { width: 45px; transition: all 0.3s ease; }
+    .logo h4 { margin: 8px 0 0 0; color: #fff; transition: opacity 0.3s ease; }
+
+    .sidebar.collapsed .logo h4 {
+      opacity: 0;
+      height: 0;
+      overflow: hidden;
+    }
+
+    .profile {
+      text-align: center;
+      margin-bottom: 30px;
+      transition: all 0.3s ease;
+    }
+
+    .profile img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid white;
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed .profile img {
+      width: 45px;
+      height: 45px;
+    }
+
+    .sidebar.collapsed .profile h6 {
+      display: none;
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.3s ease, padding 0.3s ease;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active { background-color: #0d5032; }
+
+    .sidebar.collapsed a {
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .sidebar.collapsed a span { display: none; }
+
+    .logout {
+      margin-top: auto;
+      width: 100%;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      padding-top: 15px;
+    }
+
+    .logout a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      transition: background 0.3s ease;
+    }
+
+    .logout a:hover { background-color: #0d5032; }
+
+    .sidebar.collapsed .logout a {
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .sidebar.collapsed .logout a span { display: none; }
+
+    /* ===== Main Content ===== */
+    .main-content {
+      margin-left: 250px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: margin-left 0.3s ease, width 0.3s ease;
+      width: calc(100% - 250px);
+    }
+
+    .sidebar.collapsed ~ .main-content {
+      margin-left: 80px;
+      width: calc(100% - 80px);
+    }
+
+    header {
+      background-color: var(--branco);
+      padding: 15px 25px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h4 { 
+      margin: 0; 
+      color: var(--texto-principal);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-info img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+    }
+
+    main {
+      flex: 1;
+      padding: 40px 25px;
+      background-color: var(--cor-fundo);
+    }
+
+    /* ===== Conteúdo Usuários ===== */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .page-header h2 {
+      color: #146c43;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .btn-adicionar {
+      background-color: #146c43;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      transition: 0.3s;
+    }
+
+    .btn-adicionar:hover {
+      background-color: #0d5032;
+    }
+
+    .usuarios-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      padding: 25px;
+      margin-bottom: 25px;
+    }
+
+    .table {
+      width: 100%;
+      margin-bottom: 0;
+    }
+
+    .table th {
+      background-color: #f8f9fa;
+      color: #146c43;
+      font-weight: 600;
+      border-bottom: 2px solid #dee2e6;
+    }
+
+    .table td {
+      vertical-align: middle;
+      padding: 12px 8px;
+    }
+
+    .badge-gerente { background-color: #dc3545; }
+    .badge-cooperativa { background-color: #fd7e14; }
+    .badge-armazem { background-color: #20c997; }
+    .badge-agente { background-color: #0d6efd; }
+
+    .btn-editar {
+      background-color: #ffc107;
+      color: #212529;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.875rem;
+    }
+
+    .btn-editar:hover {
+      background-color: #e0a800;
+    }
+
+    .btn-deletar {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.875rem;
+    }
+
+    .btn-deletar:hover {
+      background-color: #c82333;
+    }
+
+    .sem-usuarios {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      padding: 40px 0;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #146c43;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Modal styles */
+    .modal-header {
+      background-color: #146c43;
+      color: white;
+    }
+
+    .search-container {
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      padding: 8px 15px;
+      width: 100%;
+      max-width: 400px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== Sidebar ===== -->
+  <div class="sidebar" id="sidebar">
+    <i class="bi bi-list toggler" id="toggle-btn"></i>
+
+    <div class="logo">
+      <img src="img/logo2.png" alt="Semeia Web">
+      <h4>Semeia Web</h4>
+    </div>
+
+    <div class="profile">
+      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Usuário">
+      <h6>Annatoli Karpov Bartolomeu</h6>
+    </div>
+
+    <a href="dashboard_gerente.html"><i class="bi bi-house-fill"></i><span>Início</span></a>
+    <a href="estoque.html"><i class="bi bi-box-seam"></i><span>Estoque</span></a>
+    <a href="distribuicao.html"><i class="bi bi-truck"></i><span>Distribuição</span></a>
+    <a href="relatorios.html"><i class="bi bi-bar-chart-line"></i><span>Relatórios</span></a>
+    <a href="usuarios.html" class="active"><i class="bi bi-people"></i><span>Usuários</span></a>
+    <a href="notificacoes.html"><i class="bi bi-bell"></i><span>Notificações</span></a>
+    <a href="configuracao.html"><i class="bi bi-gear"></i><span>Configurações</span></a>
+
+    <div class="logout">
+      <a href="../login.html"><i class="bi bi-box-arrow-right"></i><span>Sair</span></a>
+    </div>
+  </div>
+
+  <!-- ===== Conteúdo Principal ===== -->
+  <div class="main-content" id="main-content">
+    <header>
+      <h4>Gerenciar Usuários</h4>
+      <div class="user-info">
+        <span>Bem-vindo, Annatoli</span>
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Usuário">
+      </div>
+    </header>
+
+    <main>
+      <div class="container-fluid">
+        <div class="page-header">
+          <h2>Usuários do Sistema</h2>
+          <button class="btn-adicionar" data-bs-toggle="modal" data-bs-target="#adicionarUsuarioModal">
+            <i class="bi bi-plus-circle"></i> Adicionar Usuário
+          </button>
+        </div>
+
+        <!-- Barra de busca -->
+        <div class="search-container">
+          <input type="text" class="search-input" id="searchInput" placeholder="Buscar por email...">
+        </div>
+
+        <div class="usuarios-card">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Email</th>
+                  <th>Tipo</th>
+                  <th>Data de Criação</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="usuariosTableBody">
+                <tr>
+                  <td colspan="5" class="sem-usuarios">Carregando usuários...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Adicionar Usuário -->
+  <div class="modal fade" id="adicionarUsuarioModal" tabindex="-1" aria-labelledby="adicionarUsuarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="adicionarUsuarioModalLabel">Adicionar Novo Usuário</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="adicionarUsuarioForm">
+            <div class="mb-3">
+              <label for="novoEmail" class="form-label">Email</label>
+              <input type="email" class="form-control" id="novoEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="novaSenha" class="form-label">Senha</label>
+              <input type="password" class="form-control" id="novaSenha" minlength="6" required>
+              <div class="form-text">A senha deve ter pelo menos 6 caracteres.</div>
+            </div>
+            <div class="mb-3">
+              <label for="novoTipo" class="form-label">Tipo de Usuário</label>
+              <select class="form-select" id="novoTipo" required>
+                <option value="">Selecione...</option>
+                <option value="gerente">Gerente</option>
+                <option value="cooperativa">Cooperativa</option>
+                <option value="armazem">Armazém</option>
+                <option value="agente">Agente</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="btnSalvarUsuario">
+            <span class="loading" id="loadingSalvar" style="display: none;"></span>
+            <span id="textoBtnSalvar">Salvar Usuário</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Editar Usuário -->
+  <div class="modal fade" id="editarUsuarioModal" tabindex="-1" aria-labelledby="editarUsuarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editarUsuarioModalLabel">Editar Usuário</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editarUsuarioForm">
+            <input type="hidden" id="editarUsuarioId">
+            <div class="mb-3">
+              <label for="editarEmail" class="form-label">Email</label>
+              <input type="email" class="form-control" id="editarEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="editarSenha" class="form-label">Nova Senha (opcional)</label>
+              <input type="password" class="form-control" id="editarSenha" minlength="6">
+              <div class="form-text">Deixe em branco para manter a senha atual.</div>
+            </div>
+            <div class="mb-3">
+              <label for="editarTipo" class="form-label">Tipo de Usuário</label>
+              <select class="form-select" id="editarTipo" required>
+                <option value="gerente">Gerente</option>
+                <option value="cooperativa">Cooperativa</option>
+                <option value="armazem">Armazém</option>
+                <option value="agente">Agente</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="btnAtualizarUsuario">
+            <span class="loading" id="loadingEditar" style="display: none;"></span>
+            <span id="textoBtnEditar">Atualizar Usuário</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Deletar Usuário -->
+  <div class="modal fade" id="deletarUsuarioModal" tabindex="-1" aria-labelledby="deletarUsuarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deletarUsuarioModalLabel">Confirmar Exclusão</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Tem certeza que deseja excluir o usuário <span id="usuarioDeletarEmail"></span>?</p>
+          <p class="text-danger"><small>Esta ação não pode ser desfeita.</small></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-danger" id="confirmarDeletarUsuario">
+            <span class="loading" id="loadingDeletar" style="display: none;"></span>
+            <span id="textoBtnDeletar">Excluir Usuário</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_BASE_URL = 'http://localhost:5000/api';
+
+    // Função para alternar a sidebar
+    const sidebar = document.getElementById("sidebar");
+    const mainContent = document.getElementById("main-content");
+    const toggleBtn = document.getElementById("toggle-btn");
+
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("collapsed");
+      mainContent.classList.toggle("expanded");
+    });
+
+    // Função para mostrar alerta
+    function showAlert(message, type = 'success') {
+      const existingAlert = document.querySelector('.custom-alert');
+      if (existingAlert) {
+        existingAlert.remove();
+      }
+
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `custom-alert alert alert-${type} alert-dismissible fade show`;
+      alertDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+      `;
+      alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      
+      document.body.appendChild(alertDiv);
+      
+      setTimeout(() => {
+        if (alertDiv.parentNode) {
+          alertDiv.remove();
+        }
+      }, 5000);
+    }
+
+    // Carregar usuários ao abrir a página
+    document.addEventListener('DOMContentLoaded', function() {
+      carregarUsuarios();
+    });
+
+    // Função para carregar todos os usuários
+    async function carregarUsuarios() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/listar-usuarios`);
+        const data = await response.json();
+
+        if (data.success) {
+          exibirUsuarios(data.usuarios);
+        } else {
+          showAlert('Erro ao carregar usuários', 'danger');
+        }
+      } catch (error) {
+        console.error('Erro ao carregar usuários:', error);
+        showAlert('Erro de conexão com o servidor', 'danger');
+      }
+    }
+
+    // Função para exibir usuários na tabela
+    function exibirUsuarios(usuarios) {
+      const tbody = document.getElementById('usuariosTableBody');
+      
+      if (usuarios.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="sem-usuarios">Nenhum usuário encontrado</td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = usuarios.map(usuario => `
+        <tr>
+          <td>${usuario.id}</td>
+          <td>${usuario.email}</td>
+          <td>
+            <span class="badge rounded-pill badge-${usuario.tipo_usuario}">
+              ${usuario.tipo_usuario}
+            </span>
+          </td>
+          <td>${usuario.data_criacao}</td>
+          <td>
+            <button class="btn-editar btn-sm me-1" onclick="editarUsuario(${usuario.id})">
+              <i class="bi bi-pencil"></i> Editar
+            </button>
+            <button class="btn-deletar btn-sm" onclick="deletarUsuario(${usuario.id}, '${usuario.email}')">
+              <i class="bi bi-trash"></i> Deletar
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Função de busca
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const termo = this.value.toLowerCase();
+      const linhas = document.querySelectorAll('#usuariosTableBody tr');
+      
+      linhas.forEach(linha => {
+        const email = linha.cells[1].textContent.toLowerCase();
+        if (email.includes(termo)) {
+          linha.style.display = '';
+        } else {
+          linha.style.display = 'none';
+        }
+      });
+    });
+
+    // Adicionar usuário
+    document.getElementById('btnSalvarUsuario').addEventListener('click', async function() {
+      const email = document.getElementById('novoEmail').value;
+      const senha = document.getElementById('novaSenha').value;
+      const tipo = document.getElementById('novoTipo').value;
+
+      if (!email || !senha || !tipo) {
+        showAlert('Preencha todos os campos obrigatórios', 'danger');
+        return;
+      }
+
+      // Mostrar loading
+      document.getElementById('loadingSalvar').style.display = 'inline-block';
+      document.getElementById('textoBtnSalvar').textContent = 'Salvando...';
+      this.disabled = true;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/adicionar-usuario`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            senha: senha,
+            tipo_usuario: tipo
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          showAlert('Usuário criado com sucesso!');
+          const modal = bootstrap.Modal.getInstance(document.getElementById('adicionarUsuarioModal'));
+          modal.hide();
+          document.getElementById('adicionarUsuarioForm').reset();
+          carregarUsuarios();
+        } else {
+          showAlert(data.message, 'danger');
+        }
+      } catch (error) {
+        console.error('Erro ao criar usuário:', error);
+        showAlert('Erro de conexão com o servidor', 'danger');
+      } finally {
+        // Restaurar botão
+        document.getElementById('loadingSalvar').style.display = 'none';
+        document.getElementById('textoBtnSalvar').textContent = 'Salvar Usuário';
+        this.disabled = false;
+      }
+    });
+
+    // Variáveis para edição e deleção
+    let usuarioParaEditar = null;
+    let usuarioParaDeletar = null;
+
+    // Função para editar usuário
+    async function editarUsuario(id) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/listar-usuarios`);
+        const data = await response.json();
+
+        if (data.success) {
+          const usuario = data.usuarios.find(u => u.id === id);
+          if (usuario) {
+            usuarioParaEditar = usuario;
+            document.getElementById('editarUsuarioId').value = usuario.id;
+            document.getElementById('editarEmail').value = usuario.email;
+            document.getElementById('editarTipo').value = usuario.tipo_usuario;
+            document.getElementById('editarSenha').value = '';
+            
+            const modal = new bootstrap.Modal(document.getElementById('editarUsuarioModal'));
+            modal.show();
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao carregar dados do usuário:', error);
+        showAlert('Erro ao carregar dados do usuário', 'danger');
+      }
+    }
+
+    // Configurar evento de atualização
+    document.getElementById('btnAtualizarUsuario').addEventListener('click', async function() {
+      if (!usuarioParaEditar) return;
+
+      const id = document.getElementById('editarUsuarioId').value;
+      const email = document.getElementById('editarEmail').value;
+      const senha = document.getElementById('editarSenha').value;
+      const tipo = document.getElementById('editarTipo').value;
+
+      // Mostrar loading
+      document.getElementById('loadingEditar').style.display = 'inline-block';
+      document.getElementById('textoBtnEditar').textContent = 'Atualizando...';
+      this.disabled = true;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/editar-usuario/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            tipo_usuario: tipo,
+            nova_senha: senha || null
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          showAlert('Usuário atualizado com sucesso!');
+          const modal = bootstrap.Modal.getInstance(document.getElementById('editarUsuarioModal'));
+          modal.hide();
+          carregarUsuarios();
+        } else {
+          showAlert(data.message, 'danger');
+        }
+      } catch (error) {
+        console.error('Erro ao atualizar usuário:', error);
+        showAlert('Erro de conexão com o servidor', 'danger');
+      } finally {
+        // Restaurar botão
+        document.getElementById('loadingEditar').style.display = 'none';
+        document.getElementById('textoBtnEditar').textContent = 'Atualizar Usuário';
+        this.disabled = false;
+        usuarioParaEditar = null;
+      }
+    });
+
+    // Função para deletar usuário
+    function deletarUsuario(id, email) {
+      usuarioParaDeletar = { id, email };
+      document.getElementById('usuarioDeletarEmail').textContent = email;
+      
+      const modal = new bootstrap.Modal(document.getElementById('deletarUsuarioModal'));
+      modal.show();
+    }
+
+    // Configurar evento de confirmação de deleção
+    document.getElementById('confirmarDeletarUsuario').addEventListener('click', async function() {
+      if (!usuarioParaDeletar) return;
+
+      // Mostrar loading
+      document.getElementById('loadingDeletar').style.display = 'inline-block';
+      document.getElementById('textoBtnDeletar').textContent = 'Excluindo...';
+      this.disabled = true;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/deletar-usuario/${usuarioParaDeletar.id}`, {
+          method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          showAlert('Usuário excluído com sucesso!');
+          const modal = bootstrap.Modal.getInstance(document.getElementById('deletarUsuarioModal'));
+          modal.hide();
+          carregarUsuarios();
+        } else {
+          showAlert(data.message, 'danger');
+        }
+      } catch (error) {
+        console.error('Erro ao excluir usuário:', error);
+        showAlert('Erro de conexão com o servidor', 'danger');
+      } finally {
+        // Restaurar botão
+        document.getElementById('loadingDeletar').style.display = 'none';
+        document.getElementById('textoBtnDeletar').textContent = 'Excluir Usuário';
+        this.disabled = false;
+        usuarioParaDeletar = null;
+      }
+    });
+
+    // Limpar formulários quando modais fecharem
+    document.getElementById('adicionarUsuarioModal').addEventListener('hidden.bs.modal', function() {
+      document.getElementById('adicionarUsuarioForm').reset();
+    });
+
+    document.getElementById('editarUsuarioModal').addEventListener('hidden.bs.modal', function() {
+      usuarioParaEditar = null;
+    });
+  </script>
+</body>
+</html>
+
+
