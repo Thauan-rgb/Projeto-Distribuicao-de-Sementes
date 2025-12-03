@@ -88,10 +88,10 @@ Criar uma plataforma digital capaz de:
 - Transações  
 
 ### **Ferramentas**
-- Postman / Insomnia  
+- Postman 
 - MySQL Workbench  
 - Git / GitHub  
-- Canva (protótipos)
+- Figma (protótipos)
 
 ---
 
