@@ -18,6 +18,15 @@ Criar uma plataforma digital capaz de:
 
 ---
 
+## 🚀 Equipe
+
+- Arthur Vinícius
+- Caio Sabino
+- Marcos Vinicius
+- Thauan Bezerra
+
+---
+
 ## 🧩 Funcionalidades
 
 ### 🔹 Cadastros
