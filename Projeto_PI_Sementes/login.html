@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Semeia Web - Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #e3f2e1, #f8faf8);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Inter", sans-serif;
+    }
+
+    .login-card {
+      background: #fff;
+      padding: 3rem 2.5rem;
+      border-radius: 1.25rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 420px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .login-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+    }
+
+    .login-logo {
+      display: block;
+      margin: 0 auto 1rem auto;
+      width: 80px;
+    }
+
+    .login-title {
+      text-align: center;
+      color: #1d4d2d;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-subtitle {
+      text-align: center;
+      color: #6c757d;
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .form-control {
+      border-radius: 0.75rem;
+      padding: 0.75rem;
+      font-size: 0.95rem;
+    }
+
+    .btn-login {
+      background-color: #2e7d32;
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      border-radius: 0.75rem;
+      padding: 0.75rem;
+      transition: background 0.3s ease;
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    .btn-login:hover {
+      background-color: #256526;
+    }
+
+    .btn-create-password {
+      background-color: transparent;
+      border: 1px solid #2e7d32;
+      color: #2e7d32;
+      font-weight: 500;
+      border-radius: 0.75rem;
+      padding: 0.75rem;
+      transition: all 0.3s ease;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+
+    .btn-create-password:hover {
+      background-color: #e8f5e9;
+    }
+
+    .govbr-logo {
+      display: block;
+      margin: 1.5rem auto 0 auto;
+      width: 120px;
+      opacity: 0.9;
+      transition: opacity 0.3s;
+    }
+
+    .govbr-logo:hover {
+      opacity: 1;
+    }
+
+    .modal-content {
+      border-radius: 1.25rem;
+      border: none;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .modal-header {
+      border-bottom: 1px solid #e9ecef;
+      padding: 1.5rem 2rem 1rem;
+    }
+
+    .modal-title {
+      color: #1d4d2d;
+      font-weight: 600;
+    }
+
+    .modal-body {
+      padding: 1rem 2rem 1.5rem;
+    }
+
+    .btn-close {
+      border-radius: 50%;
+      padding: 0.5rem;
+    }
+
+    .btn-close:focus {
+      box-shadow: none;
+    }
+
+    .alert {
+      border-radius: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .spinner-border-sm {
+      width: 1rem;
+      height: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <img src="img/ipa.png" alt="Logo IPA" class="login-logo">
+    <h3 class="login-title">Sistema de Sementes</h3>
+    <p class="login-subtitle">Entre com seu email Gov</p>
+
+    <form id="loginForm">
+      <div class="mb-3">
+        <input type="email" id="email" class="form-control" placeholder="Email gov" required>
+      </div>
+      <div class="mb-3">
+        <input type="password" id="senha" class="form-control" placeholder="Senha" required>
+      </div>
+      <button type="submit" class="btn btn-login" id="loginBtn">
+        <span class="btn-text">Entrar</span>
+        <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+      </button>
+      <button type="button" class="btn btn-create-password" data-bs-toggle="modal" data-bs-target="#createPasswordModal">
+        Criar Senha
+      </button>
+    </form>
+
+    <div id="loginAlert" class="alert alert-danger d-none" role="alert"></div>
+
+    <img src="img/gov.png" alt="GOV.BR" class="govbr-logo">
+  </div>
+
+  <!-- Modal para criar senha -->
+  <div class="modal fade" id="createPasswordModal" tabindex="-1" aria-labelledby="createPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createPasswordModalLabel">Criar Nova Senha</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="createPasswordForm">
+            <div class="mb-3">
+              <label for="createEmail" class="form-label">Email gov</label>
+              <input type="email" class="form-control" id="createEmail" placeholder="Digite seu email gov" required>
+            </div>
+            <div class="mb-3">
+              <label for="newPassword" class="form-label">Nova Senha</label>
+              <input type="password" class="form-control" id="newPassword" placeholder="Digite a nova senha" required>
+            </div>
+            <div class="mb-3">
+              <label for="confirmPassword" class="form-label">Confirmar Senha</label>
+              <input type="password" class="form-control" id="confirmPassword" placeholder="Confirme a nova senha" required>
+            </div>
+            <div id="createPasswordAlert" class="alert d-none" role="alert"></div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-login" id="createPasswordBtn">
+                <span class="btn-text">Criar Senha</span>
+                <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_BASE_URL = 'http://localhost:5000/api';
+
+    // Função para mostrar alertas
+    function showAlert(elementId, message, type = 'danger') {
+      const alertElement = document.getElementById(elementId);
+      alertElement.textContent = message;
+      alertElement.className = `alert alert-${type}`;
+      alertElement.classList.remove('d-none');
+      
+      if (type === 'success') {
+        setTimeout(() => {
+          alertElement.classList.add('d-none');
+        }, 5000);
+      }
+    }
+
+    // Função para mostrar/ocultar loading
+    function setLoading(buttonId, isLoading) {
+      const button = document.getElementById(buttonId);
+      const spinner = button.querySelector('.spinner-border');
+      const text = button.querySelector('.btn-text');
+      
+      if (isLoading) {
+        spinner.classList.remove('d-none');
+        text.textContent = 'Carregando...';
+        button.disabled = true;
+      } else {
+        spinner.classList.add('d-none');
+        text.textContent = buttonId === 'loginBtn' ? 'Entrar' : 'Criar Senha';
+        button.disabled = false;
+      }
+    }
+
+    // Login - CÓDIGO CORRIGIDO
+    document.getElementById("loginForm").addEventListener("submit", async function(event) {
+      event.preventDefault();
+      
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const senha = document.getElementById("senha").value.trim();
+      
+      setLoading('loginBtn', true);
+      document.getElementById('loginAlert').classList.add('d-none');
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, senha })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Salvar token no localStorage
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('userType', data.tipo_usuario);
+          
+          // REDIRECIONAMENTO CORRIGIDO - usando Gestor em vez de Gerente
+          const redirectMap = {
+            'gerente': 'Gestor/dashboard_gerente.html',      // ← CORRIGIDO
+            'cooperativa': 'Cooperativa/dashboard_cooperativa.html',
+            'armazem': 'Armazem/dashboard_operador.html',
+            'agente': 'Agente/dashboard_agente.html'
+          };
+          
+          const redirectUrl = redirectMap[data.tipo_usuario];
+          if (redirectUrl) {
+            window.location.href = redirectUrl;
+          } else {
+            // Fallback: usar o redirect da API se o mapeamento falhar
+            window.location.href = data.redirect;
+          }
+        } else {
+          showAlert('loginAlert', data.message);
+        }
+      } catch (error) {
+        console.error('Erro no login:', error);
+        showAlert('loginAlert', 'Erro de conexão com o servidor');
+      } finally {
+        setLoading('loginBtn', false);
+      }
+    });
+
+    // Criar senha
+    document.getElementById("createPasswordForm").addEventListener("submit", async function(event) {
+      event.preventDefault();
+      
+      const email = document.getElementById("createEmail").value.trim().toLowerCase();
+      const newPassword = document.getElementById("newPassword").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+      
+      // Validações client-side
+      if (newPassword !== confirmPassword) {
+        showAlert('createPasswordAlert', 'As senhas não coincidem');
+        return;
+      }
+      
+      if (newPassword.length < 6) {
+        showAlert('createPasswordAlert', 'A senha deve ter pelo menos 6 caracteres');
+        return;
+      }
+
+      setLoading('createPasswordBtn', true);
+      document.getElementById('createPasswordAlert').classList.add('d-none');
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/criar-senha`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            nova_senha: newPassword,
+            confirmar_senha: confirmPassword
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          showAlert('createPasswordAlert', data.message, 'success');
+          document.getElementById("createPasswordForm").reset();
+          
+          // Fechar modal após 2 segundos
+          setTimeout(() => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('createPasswordModal'));
+            modal.hide();
+          }, 2000);
+        } else {
+          showAlert('createPasswordAlert', data.message);
+        }
+      } catch (error) {
+        console.error('Erro ao criar senha:', error);
+        showAlert('createPasswordAlert', 'Erro de conexão com o servidor');
+      } finally {
+        setLoading('createPasswordBtn', false);
+      }
+    });
+
+    // Verificar email ao digitar (opcional)
+    document.getElementById('createEmail').addEventListener('blur', async function() {
+      const email = this.value.trim().toLowerCase();
+      if (email) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/verificar-email/${email}`);
+          const data = await response.json();
+          
+          if (data.exists) {
+            showAlert('createPasswordAlert', 'Este email já está cadastrado', 'warning');
+          } else {
+            document.getElementById('createPasswordAlert').classList.add('d-none');
+          }
+        } catch (error) {
+          console.error('Erro ao verificar email:', error);
+        }
+      }
+    });
+
+    // Código de fallback caso a API não esteja disponível
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+      // Fallback para quando a API não responde
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const senha = document.getElementById("senha").value.trim();
+      
+      // Verificação local de fallback
+      if (email === "gerente@ipa.gov.br" && senha === "gerente123") {
+        window.location.href = "Gestor/dashboard_gerente.html";
+      } else if (email === "cooperativa@ipa.gov.br" && senha === "cooperativa123") {
+        window.location.href = "Cooperativa/dashboard_cooperativa.html";
+      } else if (email === "armazem@ipa.gov.br" && senha === "armazem123") {
+        window.location.href = "Armazem/dashboard_operador.html";
+      } else if (email === "agente@ipa.gov.br" && senha === "agente123") {
+        window.location.href = "Agente/dashboard_agente.html";
+      }
+      // Se chegou aqui, a API vai tratar o login
+    });
+  </script>
+</body>
+</html>

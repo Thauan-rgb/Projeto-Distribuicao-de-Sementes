@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Semeia Web - Lotes de Sementes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --cor-primaria: #2e7d32;
+      --cor-secundaria: #4caf50;
+      --cor-fundo: #f4f6f5;
+      --texto-principal: #333;
+      --branco: #fff;
+    }
+
+    body {
+      background-color: #f5f7f5;
+      font-family: "Poppins", "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+
+    /* ===== Sidebar ===== */
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+      background-color: #146c43;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 10px;
+      position: fixed;
+      transition: width 0.3s ease;
+      overflow: hidden;
+    }
+
+    .sidebar.collapsed { width: 80px; }
+
+    .toggler {
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #fff;
+      align-self: flex-start;
+      margin-bottom: 15px;
+      margin-left: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed .toggler {
+      align-self: center;
+      margin: 15px 0;
+    }
+
+    .toggler:hover { transform: scale(1.1); }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .logo img { width: 45px; transition: all 0.3s ease; }
+    .logo h4 { margin: 8px 0 0 0; color: #fff; transition: opacity 0.3s ease; }
+
+    .sidebar.collapsed .logo h4 {
+      opacity: 0;
+      height: 0;
+      overflow: hidden;
+    }
+
+    .profile {
+      text-align: center;
+      margin-bottom: 30px;
+      transition: all 0.3s ease;
+    }
+
+    .profile img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid white;
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed .profile img {
+      width: 45px;
+      height: 45px;
+    }
+
+    .sidebar.collapsed .profile h6 {
+      display: none;
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.3s ease, padding 0.3s ease;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active { background-color: #0d5032; }
+
+    .sidebar.collapsed a {
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .sidebar.collapsed a span { display: none; }
+
+    .logout {
+      margin-top: auto;
+      width: 100%;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      padding-top: 15px;
+    }
+
+    .logout a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      transition: background 0.3s ease;
+    }
+
+    .logout a:hover { background-color: #0d5032; }
+
+    .sidebar.collapsed .logout a {
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .sidebar.collapsed .logout a span { display: none; }
+
+    /* ===== Main Content ===== */
+    .main-content {
+      margin-left: 250px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: margin-left 0.3s ease, width 0.3s ease;
+      width: calc(100% - 250px);
+    }
+
+    .sidebar.collapsed ~ .main-content {
+      margin-left: 80px;
+      width: calc(100% - 80px);
+    }
+
+    header {
+      background-color: var(--branco);
+      padding: 15px 25px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h4 { margin: 0; color: var(--texto-principal); }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-info img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+    }
+
+    main {
+      flex: 1;
+      padding: 25px;
+      background-color: var(--cor-fundo);
+    }
+
+    /* ===== Tabela ===== */
+    .table-container {
+      background: var(--branco);
+      border-radius: 12px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead tr {
+      background-color: var(--cor-secundaria);
+      color: var(--branco);
+    }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+    }
+
+    tbody tr:hover { background-color: #f1f8f2; }
+
+    .btn-add {
+      background-color: var(--cor-secundaria);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    .btn-add:hover { background-color: var(--cor-primaria); }
+
+    .table-actions i {
+      cursor: pointer;
+      margin-right: 10px;
+      transition: color 0.2s;
+    }
+
+    .table-actions i:hover { color: var(--cor-secundaria); }
+  </style>
+</head>
+<body>
+  <!-- ===== Sidebar ===== -->
+  <div class="sidebar" id="sidebar">
+    <i class="bi bi-list toggler" id="toggle-btn"></i>
+
+    <div class="logo">
+      <img src="img/logo2.png" alt="Semeia Web">
+      <h4>Semeia Web</h4>
+    </div>
+
+    <div class="profile">
+      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Usuário">
+      <h6>Katy Perry</h6>
+    </div>
+
+    <a href="dashboard_cooperativa.html"><i class="bi bi-house-fill"></i><span>Início</span></a>
+    <a href="lotes.html" class="active"><i class="bi bi-box-seam"></i><span>Lotes de Sementes</span></a>
+    <a href="distribuicao.html"><i class="bi bi-truck"></i><span>Distribuição</span></a>
+    <a href="agricultores.html"><i class="bi bi-people"></i><span>Agricultores</span></a>
+    <a href="relatorios.html"><i class="bi bi-file-earmark-text"></i><span>Relatórios</span></a>
+    <a href="solicitar.html"><i class="bi bi-plus-circle"></i><span>Solicitar Sementes</span></a>
+    <a href="rastreamento.html"><i class="bi bi-search"></i><span>Rastreamento</span></a>
+    <a href="notificacoes.html"><i class="bi bi-bell"></i><span>Notificações</span></a>
+    <a href="configuracao.html"><i class="bi bi-gear"></i><span>Configurações</span></a>
+
+    <div class="logout">
+      <a href="../login.html"><i class="bi bi-box-arrow-right"></i><span>Sair</span></a>
+    </div>
+  </div>
+
+  <!-- ===== Conteúdo Principal ===== -->
+  <div class="main-content">
+    <header>
+      <h4>Lotes de Sementes</h4>
+      <div class="user-info">
+        <span>Bem-vinda, Katy</span>
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Usuário">
+      </div>
+    </header>
+
+    <main>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-success">📦 Lotes de Sementes</h5>
+        <button class="btn-add" onclick="window.location.href='adicionar_lote.html'">
+          <i class="bi bi-plus-circle me-2"></i>Adicionar Novo Lote
+        </button>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID do Lote</th>
+              <th>Tipo de Semente</th>
+              <th>Quantidade</th>
+              <th>Data de Recebimento</th>
+              <th>Validade</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>#001</td>
+              <td>Feijão</td>
+              <td>100 kg</td>
+              <td>02/10/2025</td>
+              <td>02/04/2026</td>
+              <td><span class="badge bg-success">Disponível</span></td>
+              <td class="table-actions">
+                <i class="bi bi-eye-fill text-primary"></i>
+                <i class="bi bi-pencil-fill text-warning"></i>
+                <i class="bi bi-trash-fill text-danger"></i>
+              </td>
+            </tr>
+            <tr>
+              <td>#002</td>
+              <td>Milho</td>
+              <td>150 kg</td>
+              <td>10/10/2025</td>
+              <td>10/05/2026</td>
+              <td><span class="badge bg-success">Disponível</span></td>
+              <td class="table-actions">
+                <i class="bi bi-eye-fill text-primary"></i>
+                <i class="bi bi-pencil-fill text-warning"></i>
+                <i class="bi bi-trash-fill text-danger"></i>
+              </td>
+            </tr>
+            <tr>
+              <td>#003</td>
+              <td>Arroz</td>
+              <td>80 kg</td>
+              <td>15/10/2025</td>
+              <td>15/04/2026</td>
+              <td><span class="badge bg-secondary">Esgotado</span></td>
+              <td class="table-actions">
+                <i class="bi bi-eye-fill text-primary"></i>
+                <i class="bi bi-pencil-fill text-warning"></i>
+                <i class="bi bi-trash-fill text-danger"></i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const sidebar = document.getElementById("sidebar");
+    const toggleBtn = document.getElementById("toggle-btn");
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("collapsed");
+    });
+  </script>
+</body>
+</html>
+
+
+

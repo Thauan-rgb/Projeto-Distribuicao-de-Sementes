@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório: Entregas por Município - Semeia Web</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --cor-primaria: #2e7d32;
+      --cor-secundaria: #4caf50;
+      --cor-fundo: #f4f6f5;
+      --texto-principal: #333;
+      --branco: #fff;
+      --verde-primario: #146c43;
+      --verde-escuro: #0d5032;
+      --bg: #f5f7f5;
+      --card-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    body {
+      background-color: #f5f7f5;
+      font-family: "Poppins", sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ===== Sidebar ===== */
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+      background-color: #146c43;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 10px;
+      position: fixed;
+      transition: width 0.3s ease;
+      overflow: hidden;
+    }
+
+    .sidebar.collapsed { width: 80px; }
+
+    .toggler {
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #fff;
+      align-self: flex-start;
+      margin-bottom: 15px;
+      margin-left: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed .toggler {
+      align-self: center;
+      margin: 15px 0;
+    }
+
+    .toggler:hover { transform: scale(1.1); }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .logo img { width: 45px; transition: all 0.3s ease; }
+    .logo h4 { margin: 8px 0 0 0; color: #fff; transition: opacity 0.3s ease; }
+
+    .sidebar.collapsed .logo h4 {
+      opacity: 0;
+      height: 0;
+      overflow: hidden;
+    }
+
+    .profile {
+      text-align: center;
+      margin-bottom: 30px;
+      transition: all 0.3s ease;
+    }
+
+    .profile img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid white;
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed .profile img {
+      width: 45px;
+      height: 45px;
+    }
+
+    .sidebar.collapsed .profile h6 {
+      display: none;
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.3s ease, padding 0.3s ease;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active { background-color: #0d5032; }
+
+    .sidebar.collapsed a {
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .sidebar.collapsed a span { display: none; }
+
+    .logout {
+      margin-top: auto;
+      width: 100%;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      padding-top: 15px;
+    }
+
+    .logout a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      transition: background 0.3s ease;
+    }
+
+    .logout a:hover { background-color: #0d5032; }
+
+    .sidebar.collapsed .logout a {
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .sidebar.collapsed .logout a span { display: none; }
+
+    /* ===== Main Content ===== */
+    .main-content {
+      margin-left: 250px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: margin-left 0.3s ease, width 0.3s ease;
+      width: calc(100% - 250px);
+    }
+
+    .sidebar.collapsed ~ .main-content {
+      margin-left: 80px;
+      width: calc(100% - 80px);
+    }
+
+    header {
+      background-color: var(--branco);
+      padding: 15px 25px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h4 { 
+      margin: 0; 
+      color: var(--texto-principal);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-info img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+    }
+
+    main {
+      flex: 1;
+      padding: 40px 25px;
+      background-color: var(--cor-fundo);
+    }
+
+    /* ===== Conteúdo Específico ===== */
+    .page-title {
+      color: #064420;
+      font-weight: 700;
+      margin-bottom: 25px;
+    }
+
+    /* ===== Card (Conteúdo Principal) ===== */
+    .container-box {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 35px;
+      margin-bottom: 20px;
+    }
+
+    /* ===== Filtros e Controles ===== */
+    .filters-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 25px;
+      align-items: flex-end;
+    }
+
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .filter-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .filter-group select,
+    .filter-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    /* ===== Botões ===== */
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn-custom {
+      border: none;
+      padding: 10px 20px;
+      font-weight: 600;
+      border-radius: 8px;
+      color: white;
+      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .btn-primary-custom { background-color: var(--verde-primario); }
+    .btn-success-custom { background-color: #28a745; }
+    .btn-info-custom { background-color: #17a2b8; }
+    .btn-warning-custom { background-color: #ffc107; color: #212529; }
+    .btn-danger-custom { background-color: #dc3545; }
+    .btn-secondary-custom { background-color: #6c757d; }
+
+    .btn-custom:hover { 
+      opacity: 0.9; 
+      transform: translateY(-2px);
+    }
+
+    .export-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .btn-pdf { background-color: #b33a00; }
+    .btn-excel { background-color: #0044cc; }
+
+    /* ===== Tabela ===== */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .table { 
+      margin-bottom: 0;
+      text-align: center;
+    }
+    
+    .table thead th {
+      background-color: #e8f5e9;
+      color: #064420;
+      border-bottom: 2px solid #064420;
+      font-weight: 700;
+      padding: 15px;
+      vertical-align: middle;
+    }
+
+    .table tbody td {
+      padding: 12px;
+      vertical-align: middle;
+    }
+
+    .table-hover tbody tr:hover {
+      background-color: rgba(232, 245, 233, 0.5);
+    }
+
+    .badge-regiao {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-metropolitana { background-color: #e3f2fd; color: #1565c0; }
+    .badge-agreste { background-color: #e8f5e9; color: #2e7d32; }
+    .badge-sertao { background-color: #fff3e0; color: #ef6c00; }
+    .badge-mata { background-color: #f3e5f5; color: #7b1fa2; }
+
+    /* ===== Gráfico ===== */
+    .chart-container {
+      width: 100%;
+      height: 400px;
+      margin-top: 20px;
+      margin-bottom: 30px;
+    }
+
+    /* ===== Modal ===== */
+    .modal-header {
+      background-color: var(--verde-primario);
+      color: white;
+    }
+
+    .modal-header .btn-close {
+      filter: brightness(0) invert(1);
+    }
+
+    /* ===== Responsividade ===== */
+    @media (max-width: 768px) {
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .sidebar {
+        transform: translateX(-100%);
+        z-index: 1050;
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .container-box {
+        padding: 20px;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .btn-custom {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    /* ===== Loader ===== */
+    .loader {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--verde-primario);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ===== Totais ===== */
+    .totals-card {
+      background: linear-gradient(135deg, #146c43 0%, #0d5032 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .total-item {
+      text-align: center;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .total-item .number {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .total-item .label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ===== Sidebar ===== -->
+  <div class="sidebar" id="sidebar">
+    <i class="bi bi-list toggler" id="toggle-btn"></i>
+
+    <div class="logo">
+      <img src="img/logo2.png" alt="Semeia Web">
+      <h4>Semeia Web</h4>
+    </div>
+
+    <div class="profile">
+      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Usuário">
+      <h6>Annatoli Karpov Bartolomeu</h6>
+    </div>
+
+    <a href="dashboard_gerente.html"><i class="bi bi-house-fill"></i><span>Início</span></a>
+    <a href="estoque.html"><i class="bi bi-box-seam"></i><span>Estoque</span></a>
+    <a href="distribuicao.html"><i class="bi bi-truck"></i><span>Distribuição</span></a>
+    <a href="relatorios.html" class="active"><i class="bi bi-bar-chart-line"></i><span>Relatórios</span></a>
+    <a href="usuarios.html"><i class="bi bi-people"></i><span>Usuários</span></a>
+    <a href="notificacoes.html"><i class="bi bi-bell"></i><span>Notificações</span></a>
+    <a href="configuracao.html"><i class="bi bi-gear"></i><span>Configurações</span></a>
+
+    <div class="logout">
+      <a href="../login.html"><i class="bi bi-box-arrow-right"></i><span>Sair</span></a>
+    </div>
+  </div>
+
+  <!-- ===== Conteúdo Principal ===== -->
+  <div class="main-content" id="main-content">
+    <header>
+      <h4>Relatórios e Análises</h4>
+      <div class="user-info">
+        <span>Bem-vindo, Annatoli</span>
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Usuário">
+      </div>
+    </header>
+
+    <main>
+      <div class="container-fluid">
+        <div class="row mb-4">
+          <div class="col-12">
+            <h2 class="page-title d-flex justify-content-between align-items-center">
+              <span>Relatório de Entregas por Município</span>
+              <small id="periodo-filtro" class="text-muted fs-6"></small>
+            </h2>
+          </div>
+        </div>
+
+        <!-- Totais -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="totals-card" id="totals-container">
+              <div class="total-item">
+                <div class="number" id="total-municipios">0</div>
+                <div class="label">Municípios</div>
+              </div>
+              <div class="total-item">
+                <div class="number" id="total-sementes">0</div>
+                <div class="label">Total de Sementes (kg)</div>
+              </div>
+              <div class="total-item">
+                <div class="number" id="total-agricultores">0</div>
+                <div class="label">Total de Agricultores</div>
+              </div>
+              <div class="total-item">
+                <div class="number" id="media-por-municipio">0</div>
+                <div class="label">Média por Município (kg)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filtros e Ações -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="container-box">
+              <div class="filters-container">
+                <div class="filter-group">
+                  <label for="regiao-filter">Região</label>
+                  <select id="regiao-filter" class="form-control">
+                    <option value="">Todas as Regiões</option>
+                    <option value="Metropolitana">Metropolitana</option>
+                    <option value="Agreste">Agreste</option>
+                    <option value="Sertão">Sertão</option>
+                    <option value="Zona da Mata">Zona da Mata</option>
+                  </select>
+                </div>
+                
+                <div class="filter-group">
+                  <label for="search-input">Buscar Município</label>
+                  <input type="text" id="search-input" class="form-control" placeholder="Digite o nome do município...">
+                </div>
+                
+                <div class="filter-group">
+                  <label for="order-by">Ordenar por</label>
+                  <select id="order-by" class="form-control">
+                    <option value="total_sementes_kg DESC">Mais Sementes (kg)</option>
+                    <option value="total_sementes_kg ASC">Menos Sementes (kg)</option>
+                    <option value="total_agricultores DESC">Mais Agricultores</option>
+                    <option value="total_agricultores ASC">Menos Agricultores</option>
+                    <option value="nome ASC">Nome (A-Z)</option>
+                    <option value="nome DESC">Nome (Z-A)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="action-buttons">
+                <button class="btn-custom btn-primary-custom" id="btn-novo-municipio">
+                  <i class="bi bi-plus-circle"></i> Novo Município
+                </button>
+                <button class="btn-custom btn-success-custom" id="btn-atualizar-dados">
+                  <i class="bi bi-arrow-clockwise"></i> Atualizar Dados
+                </button>
+                <button class="btn-custom btn-info-custom" id="btn-gerar-relatorio">
+                  <i class="bi bi-graph-up"></i> Gerar Relatório
+                </button>
+                <div class="export-buttons" style="margin-left: auto;">
+                  <button class="btn-custom btn-pdf" id="btn-exportar-pdf">
+                    <i class="bi bi-file-pdf-fill"></i> PDF
+                  </button>
+                  <button class="btn-custom btn-excel" id="btn-exportar-excel">
+                    <i class="bi bi-file-earmark-excel-fill"></i> Excel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfico -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="container-box">
+              <h4 class="mb-4">Distribuição por Município (Top 10)</h4>
+              <div class="chart-container">
+                <canvas id="municipiosChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabela -->
+        <div class="row">
+          <div class="col-12">
+            <div class="container-box">
+              <h4 class="mb-4">Dados Detalhados</h4>
+              <div class="loader" id="loader">
+                <div class="spinner"></div>
+                <p>Carregando dados...</p>
+              </div>
+              
+              <div class="table-container">
+                <table class="table table-hover" id="municipios-table">
+                  <thead>
+                    <tr>
+                      <th>Município</th>
+                      <th>Região</th>
+                      <th>Total de Sementes (kg)</th>
+                      <th>Nº de Agricultores</th>
+                      <th>Última Entrega</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-body">
+                    <!-- Dados serão carregados via JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+              
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <div id="pagination-info"></div>
+                <nav>
+                  <ul class="pagination" id="pagination">
+                    <!-- Paginação será gerada dinamicamente -->
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal para Adicionar/Editar Município -->
+  <div class="modal fade" id="municipioModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Novo Município</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="municipioForm">
+            <input type="hidden" id="municipioId">
+            <div class="mb-3">
+              <label for="nome" class="form-label">Nome do Município *</label>
+              <input type="text" class="form-control" id="nome" required>
+            </div>
+            <div class="mb-3">
+              <label for="regiao" class="form-label">Região *</label>
+              <select class="form-control" id="regiao" required>
+                <option value="">Selecione...</option>
+                <option value="Metropolitana">Metropolitana</option>
+                <option value="Agreste">Agreste</option>
+                <option value="Sertão">Sertão</option>
+                <option value="Zona da Mata">Zona da Mata</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="total_sementes_kg" class="form-label">Total de Sementes (kg) *</label>
+              <input type="number" step="0.01" class="form-control" id="total_sementes_kg" required>
+            </div>
+            <div class="mb-3">
+              <label for="total_agricultores" class="form-label">Número de Agricultores *</label>
+              <input type="number" class="form-control" id="total_agricultores" required>
+            </div>
+            <div class="mb-3">
+              <label for="data_ultima_entrega" class="form-label">Data da Última Entrega</label>
+              <input type="date" class="form-control" id="data_ultima_entrega">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-success" id="btn-salvar">Salvar Município</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação -->
+  <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirmação</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="confirmMessage">Tem certeza que deseja excluir este município?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-danger" id="btn-confirmar">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+    <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Configurações
+    const API_BASE_URL = 'http://localhost:5000/api';
+    let municipiosData = [];
+    let currentPage = 1;
+    let itemsPerPage = 10;
+    let totalPages = 1;
+    let chart = null;
+
+    // Inicialização quando a página carrega
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar data atual no filtro de período
+        const urlParams = new URLSearchParams(window.location.search);
+        const dataInicio = urlParams.get('dataInicio') || '';
+        const dataFim = urlParams.get('dataFim') || '';
+        
+        if (dataInicio && dataFim) {
+            document.getElementById('periodo-filtro').textContent = 
+                `Período: ${formatDate(dataInicio)} a ${formatDate(dataFim)}`;
+        }
+
+        // Event Listeners
+        document.getElementById('btn-novo-municipio').addEventListener('click', mostrarModalNovoMunicipio);
+        document.getElementById('btn-atualizar-dados').addEventListener('click', carregarDados);
+        document.getElementById('btn-salvar').addEventListener('click', salvarMunicipio);
+        document.getElementById('btn-exportar-pdf').addEventListener('click', exportarPDF);
+        document.getElementById('btn-exportar-excel').addEventListener('click', exportarExcel);
+        document.getElementById('btn-gerar-relatorio').addEventListener('click', gerarRelatorioCompleto);
+        document.getElementById('search-input').addEventListener('input', aplicarFiltros);
+        document.getElementById('regiao-filter').addEventListener('change', aplicarFiltros);
+        document.getElementById('order-by').addEventListener('change', aplicarFiltros);
+
+        // Carregar dados iniciais
+        carregarDados();
+
+        // Sidebar toggle
+        const sidebar = document.getElementById("sidebar");
+        const toggleBtn = document.getElementById("toggle-btn");
+        toggleBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("collapsed");
+        });
+    });
+
+    // ===== FUNÇÕES AUXILIARES =====
+
+    // Formatar data
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-BR');
+        } catch (error) {
+            return dateString;
+        }
+    }
+
+    // Calcular percentual para barra de progresso
+    function calcularPercentual(valor) {
+        if (municipiosData.length === 0) return 0;
+        const max = Math.max(...municipiosData.map(m => parseFloat(m.total_sementes_kg) || 0));
+        if (max === 0) return 0;
+        return ((parseFloat(valor) || 0) / max) * 100;
+    }
+
+    // Obter classe CSS para região
+    function getRegiaoClass(regiao) {
+        switch(regiao?.toLowerCase()) {
+            case 'metropolitana': return 'metropolitana';
+            case 'agreste': return 'agreste';
+            case 'sertão': case 'sertao': return 'sertao';
+            case 'zona da mata': case 'zona da mata': return 'mata';
+            default: return 'agreste';
+        }
+    }
+
+    // Mostrar/ocultar loader
+    function mostrarLoader(mostrar) {
+        document.getElementById('loader').style.display = mostrar ? 'block' : 'none';
+    }
+
+    // Mostrar mensagem de sucesso
+    function mostrarSucesso(mensagem) {
+        alert('✅ ' + mensagem);
+    }
+
+    // Mostrar mensagem de erro
+    function mostrarErro(mensagem) {
+        alert('❌ ' + mensagem);
+    }
+
+    // ===== FUNÇÕES DE UI =====
+
+    function atualizarTotais(dados) {
+        if (dados.length === 0) {
+            document.getElementById('total-municipios').textContent = '0';
+            document.getElementById('total-sementes').textContent = '0';
+            document.getElementById('total-agricultores').textContent = '0';
+            document.getElementById('media-por-municipio').textContent = '0';
+            return;
+        }
+        
+        const totalMunicipios = dados.length;
+        const totalSementes = dados.reduce((sum, m) => sum + (parseFloat(m.total_sementes_kg) || 0), 0);
+        const totalAgricultores = dados.reduce((sum, m) => sum + (parseInt(m.total_agricultores) || 0), 0);
+        const mediaPorMunicipio = totalSementes / totalMunicipios;
+        
+        document.getElementById('total-municipios').textContent = totalMunicipios.toLocaleString('pt-BR');
+        document.getElementById('total-sementes').textContent = totalSementes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('total-agricultores').textContent = totalAgricultores.toLocaleString('pt-BR');
+        document.getElementById('media-por-municipio').textContent = mediaPorMunicipio.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function aplicarFiltros() {
+        const regiaoFiltro = document.getElementById('regiao-filter').value.toLowerCase();
+        const buscaTexto = document.getElementById('search-input').value.toLowerCase();
+        const ordem = document.getElementById('order-by').value;
+        
+        let dadosFiltrados = [...municipiosData];
+        
+        // Aplicar filtro de região
+        if (regiaoFiltro) {
+            dadosFiltrados = dadosFiltrados.filter(municipio => 
+                municipio.regiao.toLowerCase() === regiaoFiltro
+            );
+        }
+        
+        // Aplicar filtro de busca
+        if (buscaTexto) {
+            dadosFiltrados = dadosFiltrados.filter(municipio => 
+                municipio.nome.toLowerCase().includes(buscaTexto)
+            );
+        }
+        
+        // Aplicar ordenação
+        const [campo, direcao] = ordem.split(' ');
+        dadosFiltrados.sort((a, b) => {
+            let valorA = a[campo];
+            let valorB = b[campo];
+            
+            // Converter para número se necessário
+            if (campo.includes('sementes') || campo.includes('agricultores')) {
+                valorA = parseFloat(valorA) || 0;
+                valorB = parseFloat(valorB) || 0;
+            }
+            
+            if (direcao === 'DESC') {
+                return valorB - valorA;
+            } else {
+                return valorA - valorB;
+            }
+        });
+        
+        atualizarTabela(dadosFiltrados);
+        atualizarPaginacao(dadosFiltrados.length);
+    }
+
+    function atualizarTabela(dados) {
+        const tbody = document.getElementById('table-body');
+        const inicio = (currentPage - 1) * itemsPerPage;
+        const fim = inicio + itemsPerPage;
+        const dadosPagina = dados.slice(inicio, fim);
+        
+        if (dadosPagina.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        <i class="bi bi-inbox fs-1 text-muted"></i>
+                        <p class="mt-2">Nenhum município encontrado</p>
+                        ${municipiosData.length === 0 ? '<p class="text-muted"><small>Verifique se o servidor está rodando em http://localhost:5000</small></p>' : ''}
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        let html = '';
+        dadosPagina.forEach((municipio, index) => {
+            // Verificar se o município está ativo
+            const ativo = municipio.ativo === true || municipio.ativo === 1 || municipio.ativo === undefined;
+            
+            html += `
+                <tr>
+                    <td>
+                        <strong>${municipio.nome}</strong>
+                        ${!ativo ? '<br><span class="badge bg-danger">Inativo</span>' : ''}
+                    </td>
+                    <td>
+                        <span class="badge-regiao badge-${getRegiaoClass(municipio.regiao)}">
+                            ${municipio.regiao || 'Não informada'}
+                        </span>
+                    </td>
+                    <td>
+                        <strong>${parseFloat(municipio.total_sementes_kg || 0).toLocaleString('pt-BR')} kg</strong>
+                        <div class="progress mt-1" style="height: 6px;">
+                            <div class="progress-bar bg-success" style="width: ${calcularPercentual(municipio.total_sementes_kg)}%"></div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-info">${municipio.total_agricultores || 0}</span>
+                    </td>
+                    <td>
+                        ${municipio.data_ultima_entrega ? formatDate(municipio.data_ultima_entrega) : 'N/A'}
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary" onclick="editarMunicipio(${municipio.id})" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-outline-warning" onclick="alternarStatusMunicipio(${municipio.id}, ${ativo})" title="${ativo ? 'Desativar' : 'Ativar'}">
+                                <i class="bi bi-power ${ativo ? 'text-success' : 'text-danger'}"></i>
+                            </button>
+                            <button class="btn btn-outline-danger" onclick="confirmarExclusao(${municipio.id}, '${municipio.nome.replace(/'/g, "\\'")}')" title="Excluir">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        tbody.innerHTML = html;
+    }
+
+    function atualizarPaginacao(totalItens) {
+        totalPages = Math.ceil(totalItens / itemsPerPage);
+        const pagination = document.getElementById('pagination');
+        const paginationInfo = document.getElementById('pagination-info');
+        
+        // Atualizar info de paginação
+        const inicio = (currentPage - 1) * itemsPerPage + 1;
+        const fim = Math.min(currentPage * itemsPerPage, totalItens);
+        paginationInfo.textContent = `Mostrando ${inicio} a ${fim} de ${totalItens} municípios`;
+        
+        // Criar botões de paginação
+        let html = '';
+        
+        // Botão anterior
+        html += `
+            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="mudarPagina(${currentPage - 1})">Anterior</a>
+            </li>
+        `;
+        
+        // Botões de página
+        for (let i = 1; i <= totalPages; i++) {
+            html += `
+                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="mudarPagina(${i})">${i}</a>
+                </li>
+            `;
+        }
+        
+        // Botão próximo
+        html += `
+            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="mudarPagina(${currentPage + 1})">Próximo</a>
+            </li>
+        `;
+        
+        pagination.innerHTML = html;
+    }
+
+    function mudarPagina(pagina) {
+        if (pagina < 1 || pagina > totalPages) return;
+        currentPage = pagina;
+        aplicarFiltros();
+    }
+
+    function inicializarGrafico(dados) {
+        const ctx = document.getElementById('municipiosChart').getContext('2d');
+        
+        // Destruir gráfico anterior se existir
+        if (chart) {
+            chart.destroy();
+        }
+        
+        // Ordenar por sementes (top 10)
+        const top10 = [...dados]
+            .sort((a, b) => (parseFloat(b.total_sementes_kg) || 0) - (parseFloat(a.total_sementes_kg) || 0))
+            .slice(0, 10);
+        
+        const labels = top10.map(m => m.nome);
+        const valores = top10.map(m => parseFloat(m.total_sementes_kg) || 0);
+        
+        chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total de Sementes (kg)',
+                    data: valores,
+                    backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Sementes: ${context.parsed.y.toLocaleString('pt-BR')} kg`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('pt-BR') + ' kg';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // ===== FUNÇÕES PRINCIPAIS =====
+
+    async function carregarDados() {
+        mostrarLoader(true);
+        try {
+            console.log('🔄 Carregando dados da API...');
+            const response = await fetch(`${API_BASE_URL}/municipios`);
+            
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log('📊 Dados recebidos:', data);
+            
+            if (data.success) {
+                municipiosData = data.municipios;
+                console.log(`✅ ${municipiosData.length} municípios carregados`);
+                atualizarTotais(municipiosData);
+                aplicarFiltros();
+                inicializarGrafico(municipiosData);
+            } else {
+                console.error('❌ Erro na resposta:', data.message);
+                mostrarErro('Erro ao carregar dados: ' + data.message);
+            }
+        } catch (error) {
+            console.error('❌ Erro ao conectar com API:', error);
+            mostrarErro(`Erro ao conectar com o servidor: ${error.message}`);
+            municipiosData = [];
+            atualizarTotais([]);
+            aplicarFiltros();
+        } finally {
+            mostrarLoader(false);
+        }
+    }
+
+    async function salvarMunicipio() {
+        const form = document.getElementById('municipioForm');
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
+        
+        const municipioId = document.getElementById('municipioId').value;
+        const dados = {
+            nome: document.getElementById('nome').value.trim(),
+            regiao: document.getElementById('regiao').value,
+            total_sementes_kg: parseFloat(document.getElementById('total_sementes_kg').value),
+            total_agricultores: parseInt(document.getElementById('total_agricultores').value),
+            data_ultima_entrega: document.getElementById('data_ultima_entrega').value || null
+        };
+        
+        console.log('💾 Salvando município:', dados);
+        
+        try {
+            let response;
+            let url;
+            let method;
+            
+            if (municipioId) {
+                // UPDATE
+                url = `${API_BASE_URL}/municipios/${municipioId}`;
+                method = 'PUT';
+                console.log(`📝 Atualizando município ID ${municipioId}`);
+            } else {
+                // CREATE
+                url = `${API_BASE_URL}/municipios`;
+                method = 'POST';
+                console.log('➕ Criando novo município');
+            }
+            
+            response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dados)
+            });
+            
+            console.log('📤 Resposta do servidor:', response.status);
+            
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            
+            const resultado = await response.json();
+            console.log('📥 Resultado:', resultado);
+            
+            if (resultado.success) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('municipioModal'));
+                modal.hide();
+                
+                mostrarSucesso(municipioId ? 'Município atualizado com sucesso!' : 'Município criado com sucesso!');
+                
+                // Recarregar dados após um breve delay
+                setTimeout(() => {
+                    carregarDados();
+                }, 500);
+            } else {
+                mostrarErro('Erro do servidor: ' + resultado.message);
+            }
+        } catch (error) {
+            console.error('❌ Erro ao salvar município:', error);
+            mostrarErro(`Erro ao salvar município: ${error.message}`);
+        }
+    }
+
+    async function alternarStatusMunicipio(id, ativoAtual) {
+        if (!confirm(`Tem certeza que deseja ${ativoAtual ? 'desativar' : 'ativar'} este município?`)) {
+            return;
+        }
+        
+        try {
+            const municipio = municipiosData.find(m => m.id == id);
+            if (!municipio) {
+                mostrarErro('Município não encontrado');
+                return;
+            }
+            
+            const dadosAtualizados = {
+                nome: municipio.nome,
+                regiao: municipio.regiao,
+                total_sementes_kg: municipio.total_sementes_kg,
+                total_agricultores: municipio.total_agricultores,
+                data_ultima_entrega: municipio.data_ultima_entrega,
+                ativo: !ativoAtual
+            };
+            
+            console.log(`🔄 Alternando status do município ${id}: ${ativoAtual ? 'ativo → inativo' : 'inativo → ativo'}`);
+            
+            const response = await fetch(`${API_BASE_URL}/municipios/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dadosAtualizados)
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            
+            const resultado = await response.json();
+            
+            if (resultado.success) {
+                mostrarSucesso(`Município ${ativoAtual ? 'desativado' : 'ativado'} com sucesso!`);
+                carregarDados();
+            } else {
+                mostrarErro('Erro: ' + resultado.message);
+            }
+        } catch (error) {
+            console.error('❌ Erro ao alternar status:', error);
+            mostrarErro(`Erro ao alterar status do município: ${error.message}`);
+        }
+    }
+
+    async function excluirMunicipio(id) {
+        try {
+            console.log(`🗑️  Excluindo município ID ${id}`);
+            
+            const response = await fetch(`${API_BASE_URL}/municipios/${id}`, {
+                method: 'DELETE'
+            });
+            
+            console.log('📤 Resposta da exclusão:', response.status);
+            
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            
+            const resultado = await response.json();
+            console.log('📥 Resultado da exclusão:', resultado);
+            
+            if (resultado.success) {
+                mostrarSucesso('Município excluído com sucesso!');
+                carregarDados();
+            } else {
+                mostrarErro('Erro: ' + resultado.message);
+            }
+        } catch (error) {
+            console.error('❌ Erro ao excluir município:', error);
+            mostrarErro(`Erro ao excluir município: ${error.message}`);
+        }
+    }
+
+    async function editarMunicipio(id) {
+        try {
+            console.log(`✏️  Editando município ID ${id}`);
+            
+            if (municipiosData.length === 0) {
+                await carregarDados();
+            }
+            
+            const municipio = municipiosData.find(m => m.id == id);
+            if (!municipio) {
+                mostrarErro('Município não encontrado');
+                return;
+            }
+            
+            document.getElementById('modalTitle').textContent = 'Editar Município';
+            document.getElementById('municipioId').value = municipio.id;
+            document.getElementById('nome').value = municipio.nome || '';
+            document.getElementById('regiao').value = municipio.regiao || '';
+            document.getElementById('total_sementes_kg').value = municipio.total_sementes_kg || '';
+            document.getElementById('total_agricultores').value = municipio.total_agricultores || '';
+            
+            if (municipio.data_ultima_entrega) {
+                const data = new Date(municipio.data_ultima_entrega);
+                const dataFormatada = data.toISOString().split('T')[0];
+                document.getElementById('data_ultima_entrega').value = dataFormatada;
+            } else {
+                document.getElementById('data_ultima_entrega').value = '';
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('municipioModal'));
+            modal.show();
+            
+        } catch (error) {
+            console.error('❌ Erro ao carregar município:', error);
+            mostrarErro('Erro ao carregar dados do município: ' + error.message);
+        }
+    }
+
+    // ===== FUNÇÕES DE CONTROLE =====
+
+    function mostrarModalNovoMunicipio() {
+        document.getElementById('modalTitle').textContent = 'Novo Município';
+        document.getElementById('municipioId').value = '';
+        document.getElementById('municipioForm').reset();
+        
+        const modal = new bootstrap.Modal(document.getElementById('municipioModal'));
+        modal.show();
+    }
+
+    function confirmarExclusao(id, nome) {
+        if (confirm(`Tem certeza que deseja excluir o município "${nome}"?`)) {
+            excluirMunicipio(id);
+        }
+    }
+
+    function exportarPDF() {
+        alert('Funcionalidade de exportação PDF em desenvolvimento');
+    }
+
+    function exportarExcel() {
+        alert('Funcionalidade de exportação Excel em desenvolvimento');
+    }
+
+    function gerarRelatorioCompleto() {
+        alert('Funcionalidade de relatório completo em desenvolvimento');
+    }
+
+    // ===== FUNÇÕES DE DEBUG =====
+
+    async function testarConexaoAPI() {
+        try {
+            console.log('🔍 Testando conexão com API...');
+            const response = await fetch(`${API_BASE_URL}/municipios`);
+            const data = await response.json();
+            console.log('✅ Conexão com API bem-sucedida:', data);
+            return data.success;
+        } catch (error) {
+            console.error('❌ Falha na conexão com API:', error);
+            return false;
+        }
+    }
+
+    window.debugAPI = async function() {
+        console.log('=== DEBUG API ===');
+        console.log('URL Base:', API_BASE_URL);
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/municipios`);
+            console.log('Status:', response.status);
+            const data = await response.json();
+            console.log('Dados:', data);
+            console.log('Total de municípios:', data.municipios?.length || 0);
+        } catch (error) {
+            console.error('Erro:', error);
+        }
+    };
+  </script>
+</body>
+</html>
