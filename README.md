@@ -1,5 +1,4 @@
 # 📘 Semeia Web — Plataforma de Gestão do Programa de Distribuição de Sementes (PADS)
-<p align="center"><img width="172" height="172" alt="logo2 2 (1)" src="https://github.com/user-attachments/assets/98e75e9e-b473-49c1-8430-a56f951afb3e" />
 
 
 Semeia Web é uma plataforma web voltada para modernizar o Programa de Aquisição e Distribuição de Sementes (PADS), integrando controle de estoque, logística, rastreabilidade e transparência pública.
