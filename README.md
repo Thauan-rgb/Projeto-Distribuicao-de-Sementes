@@ -1,4 +1,6 @@
 # 📘 Semeia Web — Plataforma de Gestão do Programa de Distribuição de Sementes (PADS)
+<p align="center"><img width="172" height="172" alt="logo2 2 (1)" src="https://github.com/user-attachments/assets/98e75e9e-b473-49c1-8430-a56f951afb3e" />
+
 
 Semeia Web é uma plataforma web voltada para modernizar o Programa de Aquisição e Distribuição de Sementes (PADS), integrando controle de estoque, logística, rastreabilidade e transparência pública.
 
@@ -17,6 +19,9 @@ Criar uma plataforma digital capaz de:
 - Facilitar a comunicação entre gestores, armazéns e agentes de distribuição
 
 ---
+
+📸 Tela Principal
+<p align="center"><img width="1883" height="867" alt="Captura de tela 2025-12-08 213609" src="https://github.com/user-attachments/assets/f3699f23-e470-482f-b32c-457773855b09" width="700"> </p>
 
 ## 🚀 Equipe
 
@@ -85,9 +90,10 @@ Criar uma plataforma digital capaz de:
 - Bootstrap  
 
 ### **Back-end**
-- Spring Boot (Java)  
-- API REST  
-- Swagger (documentação)  
+- Python
+- Flask 
+- MySQL
+- JWT  
 
 ### **Banco de Dados**
 - MySQL  
@@ -122,7 +128,21 @@ cooperativa@ipa.gov.br <br>
 operador@ipa.gov.br <br>
 agente@ipa.gov.br
 
-### 🔧 Backend (Spring Boot)
-```bash
-py app.py
+1️⃣ Clonar o repositório
+git clone https://github.com/usuario/projeto-distribuicao-sementes.git
 
+2️⃣ Instalar dependências
+pip install -r requirements.txt
+
+3️⃣ Configurar banco de dados no arquivo banco.py
+config = {
+    "host": "localhost",
+    "user": "root",
+    "password": "sua_senha",
+    "database": "distribuicao_sementes"}
+
+4️⃣ Rodar o servidor
+python app.py
+
+5️⃣ Acessar no navegador
+http://localhost:5000
