@@ -3,6 +3,7 @@
 
 Semeia Web é uma plataforma web voltada para modernizar o Programa de Aquisição e Distribuição de Sementes (PADS), integrando controle de estoque, logística, rastreabilidade e transparência pública.
 
+
 Este sistema foi desenvolvido como Projeto Integrador (PI), aplicando conceitos de Análise e Desenvolvimento de Sistemas.
 
 ---
