@@ -13,7 +13,7 @@ Criar uma plataforma digital capaz de:
 
 - Otimizar o controle de estoque de sementes
 - Acompanhar logística e entregas em tempo real
-- Rastrear lotes através de QR Code
+- Rastrear lotes através de códigos
 - Aumentar a transparência pública
 - Facilitar a comunicação entre gestores, armazéns e agentes de distribuição
 
