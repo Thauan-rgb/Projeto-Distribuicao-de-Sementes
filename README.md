@@ -58,7 +58,7 @@ Criar uma plataforma digital capaz de:
 - Comprovantes de entrega
 
 ### 🔹 Rastreabilidade
-- Geração de QR Code por lote
+- Geração de códigos por lote
 - Histórico completo de movimentações
 
 ### 🔹 Painel Público (Transparência)
