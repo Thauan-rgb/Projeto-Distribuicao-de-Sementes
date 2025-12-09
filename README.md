@@ -19,7 +19,7 @@ Criar uma plataforma digital capaz de:
 
 ---
 
-📸 Tela Principal
+## 📸 Tela Principal
 <p align="center"><img width="1883" height="867" alt="Captura de tela 2025-12-08 213609" src="https://github.com/user-attachments/assets/f3699f23-e470-482f-b32c-457773855b09" width="700"> </p>
 
 ## 🚀 Equipe
@@ -84,14 +84,13 @@ Criar uma plataforma digital capaz de:
 
 ### **Front-end**
 - React / Next.js  
-- TypeScript  
+- JavaScript  
 - HTML / CSS  
 - Bootstrap  
 
 ### **Back-end**
 - Python
 - Flask 
-- MySQL
 - JWT  
 
 ### **Banco de Dados**
@@ -102,7 +101,6 @@ Criar uma plataforma digital capaz de:
 - Transações  
 
 ### **Ferramentas**
-- Postman 
 - MySQL Workbench  
 - Git / GitHub  
 - Figma (protótipos)
